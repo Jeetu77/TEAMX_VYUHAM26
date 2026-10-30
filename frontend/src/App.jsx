@@ -20,9 +20,12 @@ export default function App() {
   const [tab, setTab] = useState('home')
   const Active = NAV.find(n => n.id === tab).view
   return (
-    <div className="relative min-h-screen text-slate-700 md:flex bg-slate-50">
+    <div className="relative min-h-screen text-slate-700 md:flex">
       {/* Background */}
-      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 via-white to-blue-50/40" />
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/bg-kerala.svg')" }} />
+        <div className="absolute inset-0 bg-white/60" />
+      </div>
 
       {/* Sidebar */}
       <aside className="md:w-60 md:min-h-screen border-b md:border-b-0 md:border-r border-slate-200/80 bg-white/90 backdrop-blur-xl px-4 py-4 md:py-6 flex md:flex-col items-center md:items-stretch gap-4 md:gap-8 shadow-[0_1px_3px_rgba(15,23,42,0.04)]">

@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bfe0f5"/>
+      <stop offset="1" stop-color="#f3faff"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdea"/>
+      <stop offset="1" stop-color="#2f82bb"/>
+    </linearGradient>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9cfe9"/>
+      <stop offset="1" stop-color="#d4e9f5"/>
+    </linearGradient>
+    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5fa4c9"/>
+      <stop offset="1" stop-color="#7fb9a8"/>
+    </linearGradient>
+    <linearGradient id="near" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3f9a63"/>
+      <stop offset="1" stop-color="#2a7a4a"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2459b8"/>
+      <stop offset="1" stop-color="#0b2a6e"/>
+    </linearGradient>
+    <radialGradient id="globe" cx="0.45" cy="0.4" r="0.75">
+      <stop offset="0" stop-color="#2a6fd6"/>
+      <stop offset="0.65" stop-color="#143f98"/>
+      <stop offset="1" stop-color="#0a2a6b"/>
+    </radialGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a9bf0"/>
+      <stop offset="1" stop-color="#1a4fb5"/>
+    </linearGradient>
+    <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
+      <circle cx="7" cy="7" r="1.6" fill="#7fb4ff" opacity="0.55"/>
+    </pattern>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="globeClip"><circle cx="1230" cy="410" r="285"/></clipPath>
+
+    <symbol id="palm" overflow="visible">
+      <path d="M0,0 C10,-70 -8,-130 16,-200" stroke="#6a5538" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <g stroke-linecap="round" fill="none" stroke-width="7">
+        <path d="M16,-200 C-25,-225 -75,-210 -105,-165" stroke="#2f8f4e"/>
+        <path d="M16,-200 C-10,-240 -50,-250 -92,-232" stroke="#3aa45a"/>
+        <path d="M16,-200 C30,-245 70,-255 110,-232" stroke="#3aa45a"/>
+        <path d="M16,-200 C60,-225 105,-205 130,-160" stroke="#2f8f4e"/>
+        <path d="M16,-200 C-5,-215 -40,-190 -52,-150" stroke="#46b568"/>
+        <path d="M16,-200 C40,-212 75,-188 82,-148" stroke="#46b568"/>
+        <path d="M16,-200 C14,-235 12,-262 16,-280" stroke="#3aa45a"/>
+      </g>
+    </symbol>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <g fill="#fff" opacity="0.85">
+    <ellipse cx="240" cy="120" rx="150" ry="34"/><ellipse cx="330" cy="100" rx="100" ry="30"/>
+    <ellipse cx="760" cy="80" rx="170" ry="32"/><ellipse cx="880" cy="62" rx="110" ry="28"/>
+  </g>
+
+  <!-- Hills -->
+  <path d="M0,430 C120,350 220,330 330,390 C450,300 560,290 690,380 C800,320 900,330 1000,400 L1000,600 L0,600 Z" fill="url(#far)"/>
+  <path d="M0,470 C140,400 260,380 390,440 C520,370 640,360 760,430 C860,390 960,400 1040,450 L1040,620 L0,620 Z" fill="url(#mid)"/>
+  <path d="M0,520 C110,470 230,470 330,520 C440,450 560,450 670,510 C760,480 860,490 950,530 L950,640 L0,640 Z" fill="url(#near)"/>
+
+  <!-- Water -->
+  <rect x="0" y="560" width="1100" height="340" fill="url(#water)"/>
+  <g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.28">
+    <path d="M60,640 h120"/><path d="M300,700 h160"/><path d="M120,760 h200"/>
+    <path d="M520,650 h130"/><path d="M640,730 h180"/><path d="M820,620 h110"/>
+  </g>
+
+  <!-- Houseboat + reflection -->
+  <g id="boat">
+    <path d="M150,545 L690,545 C700,545 690,575 650,582 L205,582 C170,575 148,555 150,545 Z" fill="#14305a"/>
+    <rect x="190" y="480" width="440" height="66" fill="#c99a5b"/>
+    <path d="M165,482 L330,432 L560,432 L670,482 Z" fill="#7a5a36"/>
+    <path d="M240,432 L330,410 L520,410 L590,432 Z" fill="#8c6a42"/>
+    <g fill="#2a2a2a" opacity="0.8">
+      <rect x="225" y="498" width="34" height="34" rx="3"/><rect x="290" y="498" width="34" height="34" rx="3"/>
+      <rect x="355" y="498" width="34" height="34" rx="3"/><rect x="480" y="498" width="34" height="34" rx="3"/>
+      <rect x="545" y="498" width="34" height="34" rx="3"/>
+    </g>
+    <rect x="420" y="500" width="40" height="46" fill="#5a3d22"/>
+  </g>
+  <use href="#boat" transform="translate(0,1128) scale(1,-1)" opacity="0.28"/>
+
+  <!-- Palms -->
+  <use href="#palm" transform="translate(70,640) scale(1.5)"/>
+  <use href="#palm" transform="translate(255,560) scale(1.05)"/>
+  <use href="#palm" transform="translate(360,540) scale(0.8)"/>
+  <use href="#palm" transform="translate(760,545) scale(0.75)"/>
+  <use href="#palm" transform="translate(850,560) scale(0.6)"/>
+  <use href="#palm" transform="translate(560,520) scale(0.55)"/>
+
+  <!-- Right panel -->
+  <path d="M1000,0 C930,200 1040,330 960,520 C920,640 1000,780 1090,900 L1600,900 L1600,0 Z" fill="url(#panel)"/>
+  <g stroke="#5f9cf5" stroke-width="1.6" opacity="0.55" fill="none">
+    <polyline points="1330,80 1420,150 1500,110 1600,170"/>
+    <polyline points="1420,150 1480,250 1580,290"/>
+    <polyline points="1480,250 1430,330 1520,420"/>
+    <polyline points="1100,70 1190,120 1330,80"/>
+    <polyline points="1450,640 1530,700 1590,640"/>
+    <polyline points="1380,760 1450,640"/>
+  </g>
+  <g fill="#bfe0ff" filter="url(#glow)" opacity="0.9">
+    <circle cx="1330" cy="80" r="5"/><circle cx="1420" cy="150" r="5"/><circle cx="1500" cy="110" r="4"/>
+    <circle cx="1480" cy="250" r="5"/><circle cx="1580" cy="290" r="4"/><circle cx="1430" cy="330" r="4"/>
+    <circle cx="1520" cy="420" r="5"/><circle cx="1190" cy="120" r="4"/><circle cx="1450" cy="640" r="5"/>
+    <circle cx="1530" cy="700" r="4"/><circle cx="1380" cy="760" r="4"/>
+  </g>
+
+  <!-- Globe -->
+  <circle cx="1230" cy="410" r="318" fill="none" stroke="#9ec9ff" stroke-width="3" opacity="0.5" filter="url(#glow)"/>
+  <circle cx="1230" cy="410" r="300" fill="none" stroke="#cfe5ff" stroke-width="2" opacity="0.6"/>
+  <circle cx="1230" cy="410" r="285" fill="url(#globe)"/>
+  <g clip-path="url(#globeClip)">
+    <rect x="945" y="125" width="570" height="570" fill="url(#dots)"/>
+    <g fill="#5fa0ff" opacity="0.35">
+      <path d="M1040,330 C1090,290 1150,300 1170,350 C1190,400 1130,430 1090,410 C1050,395 1030,360 1040,330 Z"/>
+      <path d="M1250,250 C1310,230 1380,260 1390,320 C1400,380 1340,400 1300,370 C1260,340 1230,300 1250,250 Z"/>
+      <path d="M1180,470 C1230,450 1290,480 1290,540 C1290,600 1230,620 1200,580 C1170,545 1160,500 1180,470 Z"/>
+    </g>
+  </g>
+
+  <!-- Shield + lock -->
+  <g transform="translate(1230,420)" filter="url(#glow)">
+    <path d="M0,-150 L125,-108 V12 C125,92 65,135 0,162 C-65,135 -125,92 -125,12 V-108 Z" fill="#eaf3ff"/>
+    <path d="M0,-130 L106,-94 V12 C106,82 55,118 0,142 C-55,118 -106,82 -106,12 V-94 Z" fill="url(#shield)"/>
+    <rect x="-40" y="-6" width="80" height="66" rx="9" fill="#eaf3ff"/>
+    <path d="M-25,-6 V-32 a25,25 0 0 1 50,0 V-6" stroke="#eaf3ff" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <circle cx="0" cy="22" r="8" fill="#1a4fb5"/>
+    <rect x="-4" y="24" width="8" height="22" rx="2" fill="#1a4fb5"/>
+  </g>
+
+  <!-- Bottom swoosh -->
+  <path d="M0,770 C250,720 520,760 800,800 C1100,840 1350,790 1600,700 V900 H0 Z" fill="#fff"/>
+  <path d="M0,760 C250,710 520,750 800,790 C1100,830 1350,780 1600,690 L1600,708 C1350,798 1100,848 800,808 C520,768 250,728 0,778 Z" fill="#6cc04a"/>
+  <path d="M0,778 C250,728 520,768 800,808 C1100,848 1350,798 1600,708 L1600,724 C1350,814 1100,864 800,824 C520,784 250,744 0,794 Z" fill="#2f82d6"/>
+</svg>
