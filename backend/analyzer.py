@@ -1,4 +1,5 @@
 import os, json, hashlib
+from datetime import date
 from anthropic import Anthropic
 from dotenv import load_dotenv
 import re
@@ -7,10 +8,46 @@ from urllib.parse import urlparse
 load_dotenv()
 MOCK = os.getenv("MOCK_AI", "false").lower() == "true"
 MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-5-5")
+DAILY_LIMIT = int(os.getenv("DAILY_API_LIMIT", "30"))  # 0 = unlimited
+# Rules already decisive at this score — skip Claude to save tokens
+RULE_CONFIDENCE_THRESHOLD = int(os.getenv("RULE_CONFIDENCE_THRESHOLD", "70"))
+
 client = None if MOCK else Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-# Cache to save tokens
+# Cache — never call Claude twice for the same message
 _cache = {}
+
+# Usage counter — resets each day
+_USAGE_FILE = os.path.join(os.path.dirname(__file__), "api_usage.json")
+
+def _load_usage() -> dict:
+    try:
+        with open(_USAGE_FILE) as f:
+            data = json.load(f)
+        if data.get("date") != str(date.today()):
+            return {"date": str(date.today()), "calls": 0}
+        return data
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"date": str(date.today()), "calls": 0}
+
+def _save_usage(data: dict):
+    with open(_USAGE_FILE, "w") as f:
+        json.dump(data, f)
+
+def get_usage() -> dict:
+    u = _load_usage()
+    return {"calls_today": u["calls"], "daily_limit": DAILY_LIMIT,
+            "calls_remaining": max(0, DAILY_LIMIT - u["calls"]) if DAILY_LIMIT > 0 else None}
+
+def _budget_ok() -> bool:
+    if DAILY_LIMIT == 0:
+        return True
+    return _load_usage()["calls"] < DAILY_LIMIT
+
+def _record_call():
+    u = _load_usage()
+    u["calls"] += 1
+    _save_usage(u)
 
 INDIAN_BRANDS = [
     "sbi","hdfc","icici","axis","paytm","phonepe","googlepay","gpay",
@@ -56,7 +93,8 @@ def _parse_json(raw: str) -> dict:
         return json.loads(match.group(0))
 
 
-def _ask_claude(prompt: str, max_tokens: int = 1024) -> str:
+def _ask_claude(prompt: str, max_tokens: int = 500) -> str:
+    _record_call()
     response = client.messages.create(
         model=MODEL,
         max_tokens=max_tokens,
@@ -154,10 +192,19 @@ def analyze(text: str) -> dict:
         return _cache[cache_key]
 
     rule_findings = run_rules(text)
+    rule_score = min(99, sum(SEVERITY_WEIGHT.get(f["severity"], 5) for f in rule_findings))
 
-    if MOCK:
-        result = _mock_analysis(rule_findings)
-    else:
+    # Decide whether to call Claude:
+    #  - always skip if mock mode
+    #  - skip if rule engine is already decisive (saves ~60% of calls)
+    #  - skip if daily budget is exhausted (fall back to rules)
+    use_ai = (
+        not MOCK
+        and rule_score < RULE_CONFIDENCE_THRESHOLD
+        and _budget_ok()
+    )
+
+    if use_ai:
         prompt = f"""You are a phishing analysis engine for Indian cybersecurity context.
 Rule-engine findings (already detected): {json.dumps(rule_findings)}
 
@@ -186,16 +233,20 @@ return an accurate verdict.
 MESSAGE:
 <<<{text}>>>"""
         result = _parse_json(_ask_claude(prompt))
+    else:
+        result = _mock_analysis(rule_findings)
+        if not MOCK:
+            # Note why AI was skipped
+            reason = "rule engine confidence sufficient" if rule_score >= RULE_CONFIDENCE_THRESHOLD else "daily API limit reached"
+            result["ai_skipped"] = reason
 
-    # Merge rule findings into result
     result["rule_findings"] = rule_findings
-
     _cache[cache_key] = result
     return result
 
 
 def generate_phishing_email(scenario: str, difficulty: str) -> dict:
-    if MOCK:
+    if MOCK or not _budget_ok():
         return {
             "subject": "Action Required: Complete your KYC update to avoid account restriction",
             "sender_display": "SBI Customer Care",
@@ -232,7 +283,7 @@ Return ONLY valid JSON:
 
 
 def generate_feedback(employee_name: str, action: str, email_subject: str) -> str:
-    if MOCK:
+    if MOCK or not _budget_ok():
         return {
             "clicked": f"{employee_name}, this was a simulated phish — no harm done, and it's a great learning moment. "
                        "The urgency and unfamiliar sender domain were the giveaways. Tip: hover over links and check the real domain before clicking.",

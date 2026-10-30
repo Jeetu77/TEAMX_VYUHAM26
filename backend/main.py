@@ -5,7 +5,7 @@ from typing import List, Literal
 from database import init_db, save_analysis, create_campaign, \
     get_campaign, update_target_status, get_all_campaigns, save_feedback, \
     get_analyses, get_analysis_stats, delete_campaign, get_employee_stats
-from analyzer import analyze, generate_phishing_email, generate_feedback, MOCK
+from analyzer import analyze, generate_phishing_email, generate_feedback, MOCK, get_usage
 from quiz import get_quiz
 import random
 
@@ -163,4 +163,4 @@ async def auto_simulate(campaign_id: int, req: AutoSimRequest):
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "mock_ai": MOCK}
+    return {"status": "ok", "mock_ai": MOCK, "api_usage": get_usage()}
