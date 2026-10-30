@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Secrets — never commit
+.env
+*.db
+
+# Node
+node_modules/
+dist/
+.parcel-cache/
+
+# Misc
+.DS_Store
+Thumbs.db
