@@ -40,11 +40,11 @@ export default function Home({ onNavigate }) {
     <div className="space-y-10">
       {/* Hero */}
       <div className="text-center pt-6 pb-2">
-        <div className="inline-flex p-4 rounded-2xl bg-blue-50 border border-blue-200 mb-5">
-          <Shield size={40} className="text-blue-600" />
+        <div className="inline-flex p-4 rounded-2xl bg-blue-500/15 border border-blue-400/30 mb-5 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+          <Shield size={40} className="text-blue-300" />
         </div>
-        <h1 className="text-3xl font-bold text-slate-900">PhishGuard</h1>
-        <p className="text-slate-500 mt-3 max-w-xl mx-auto">
+        <h1 className="text-3xl font-bold text-white drop-shadow-md">PhishGuard</h1>
+        <p className="text-slate-300 mt-3 max-w-xl mx-auto">
           An AI-powered phishing detection and security-awareness trainer.
           Spot scams before they land, and teach your team to do the same —
           without a single real email leaving the building.
@@ -56,7 +56,7 @@ export default function Home({ onNavigate }) {
 
       {/* Modules */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">What you can do</h2>
+        <h2 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">What you can do</h2>
         <div className="grid md:grid-cols-2 gap-4">
           {MODULES.map(m => (
             <button key={m.id} onClick={() => onNavigate(m.id)}
@@ -76,7 +76,7 @@ export default function Home({ onNavigate }) {
 
       {/* How it works */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">How it works</h2>
+        <h2 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">How it works</h2>
         <div className="grid md:grid-cols-3 gap-4">
           {HOW.map(h => (
             <div key={h.title} className={`${card} p-5`}>
@@ -91,7 +91,7 @@ export default function Home({ onNavigate }) {
       </div>
 
       {/* Note */}
-      <p className="text-xs text-slate-400 text-center pb-4">
+      <p className="text-xs text-slate-400/80 text-center pb-4">
         PhishGuard is a training and awareness tool. Simulation emails are generated for
         education only and never sent outside this app. Report real phishing at cybercrime.gov.in or call 1930.
       </p>

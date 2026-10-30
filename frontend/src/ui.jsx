@@ -1,7 +1,7 @@
 // Shared UI primitives + status/verdict styling, used across all screens.
 import { ShieldAlert, ShieldQuestion, ShieldCheck, MousePointerClick, Flag, Eye, Mail } from 'lucide-react'
 
-export const card = 'bg-white border border-slate-200 rounded-xl shadow-sm'
+export const card = 'bg-white/90 backdrop-blur-xl border border-white/60 rounded-xl shadow-[0_8px_30px_rgba(2,12,27,0.35)]'
 
 export const VERDICT = {
   phishing:    { label: 'Phishing',    Icon: ShieldAlert,    text: 'text-rose-600',    chip: 'bg-rose-50 text-rose-700 border-rose-200',       bar: 'bg-rose-500' },
@@ -39,8 +39,8 @@ export function StatCard({ label, value, accent = 'text-slate-900', sub }) {
 export function SectionTitle({ title, subtitle }) {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
-      {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+      <h2 className="text-xl font-semibold text-white drop-shadow-sm">{title}</h2>
+      {subtitle && <p className="text-sm text-slate-300 mt-1">{subtitle}</p>}
     </div>
   )
 }

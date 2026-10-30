@@ -20,16 +20,26 @@ export default function App() {
   const [tab, setTab] = useState('home')
   const Active = NAV.find(n => n.id === tab).view
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-700 md:flex">
+    <div className="relative min-h-screen text-slate-700 md:flex">
+      {/* Background */}
+      <div className="fixed inset-0 -z-10">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-fixed"
+          style={{ backgroundImage: "url('/bg-security.webp')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#040b18]/95 via-[#061325]/90 to-[#0a1a33]/95" />
+        <div className="absolute inset-0 bg-slate-50/[0.04]" />
+      </div>
+
       {/* Sidebar */}
-      <aside className="md:w-56 md:min-h-screen border-b md:border-b-0 md:border-r border-slate-200 bg-white px-4 py-4 md:py-6 flex md:flex-col items-center md:items-stretch gap-4 md:gap-8">
+      <aside className="md:w-60 md:min-h-screen border-b md:border-b-0 md:border-r border-white/10 bg-white/[0.06] backdrop-blur-xl px-4 py-4 md:py-6 flex md:flex-col items-center md:items-stretch gap-4 md:gap-8 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
         <div className="flex items-center gap-2.5 px-1">
-          <div className="p-1.5 rounded-lg bg-blue-50 border border-blue-200">
-            <Shield size={18} className="text-blue-600" />
+          <div className="p-1.5 rounded-lg bg-blue-500/15 border border-blue-400/30 shadow-[0_0_14px_rgba(59,130,246,0.35)]">
+            <Shield size={18} className="text-blue-300" />
           </div>
           <div className="leading-tight">
-            <div className="font-semibold text-slate-900">PhishGuard</div>
-            <div className="hidden md:block text-[10px] text-slate-400 tracking-wide uppercase">Phishing awareness</div>
+            <div className="font-semibold text-white tracking-tight">PhishGuard</div>
+            <div className="hidden md:block text-[10px] text-blue-200/60 tracking-wide uppercase">Phishing awareness</div>
           </div>
         </div>
         <nav className="flex md:flex-col gap-1 flex-1 overflow-x-auto">
@@ -37,8 +47,8 @@ export default function App() {
             <button key={id} onClick={() => setTab(id)}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition
                 ${tab === id
-                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 border border-transparent'}`}>
+                  ? 'bg-blue-500/20 text-blue-100 border border-blue-400/40 shadow-[0_0_12px_rgba(59,130,246,0.25)]'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10 border border-transparent'}`}>
               <Icon size={16} /> {label}
             </button>
           ))}
