@@ -6,6 +6,7 @@ const STATUS_COLOR = {
   clicked: [225, 29, 72],
   reported: [5, 150, 105],
   ignored: [217, 119, 6],
+  opened: [37, 99, 235],
   unread: [100, 116, 139],
 }
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1)

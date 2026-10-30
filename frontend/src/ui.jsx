@@ -1,5 +1,5 @@
 // Shared UI primitives + status/verdict styling, used across all screens.
-import { ShieldAlert, ShieldQuestion, ShieldCheck, MousePointerClick, Flag, Eye, Mail } from 'lucide-react'
+import { ShieldAlert, ShieldQuestion, ShieldCheck, MousePointerClick, Flag, Eye, Mail, MailOpen } from 'lucide-react'
 
 export const card = 'bg-white border border-slate-200/80 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] transition-shadow duration-200'
 
@@ -13,6 +13,7 @@ export const STATUS = {
   clicked:  { label: 'Clicked',  Icon: MousePointerClick, color: 'text-rose-600' },
   reported: { label: 'Reported', Icon: Flag,              color: 'text-emerald-600' },
   ignored:  { label: 'Ignored',  Icon: Eye,               color: 'text-amber-600' },
+  opened:   { label: 'Opened',   Icon: MailOpen,          color: 'text-blue-600' },
   unread:   { label: 'Unread',   Icon: Mail,              color: 'text-slate-400' },
 }
 

@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Literal
 from database import init_db, save_analysis, create_campaign, \
-    get_campaign, update_target_status, get_all_campaigns, save_feedback, \
+    get_campaign, update_target_status, mark_target_opened, get_all_campaigns, save_feedback, \
     get_analyses, get_analysis_stats, delete_campaign, get_employee_stats
 from analyzer import (analyze, analyze_image, generate_phishing_email, generate_feedback,
                       MOCK, get_usage, AIUnavailable, NoMessageFound)
@@ -29,7 +29,7 @@ class CampaignRequest(BaseModel):
 
 class ActionRequest(BaseModel):
     target_id: int
-    action: Literal["clicked", "reported", "ignored"]
+    action: Literal["opened", "clicked", "reported", "ignored"]
 
 
 def _ai_call(fn, *args):
@@ -126,6 +126,7 @@ async def get_campaign_detail(campaign_id: int):
     clicked = sum(1 for t in targets if t['status'] == 'clicked')
     reported = sum(1 for t in targets if t['status'] == 'reported')
     ignored = sum(1 for t in targets if t['status'] == 'ignored')
+    opened = sum(1 for t in targets if t['status'] == 'opened')
     awareness_score = int(((reported + ignored * 0.5) / total) * 100) if total else 0
 
     return {
@@ -136,7 +137,8 @@ async def get_campaign_detail(campaign_id: int):
             "clicked": clicked,
             "reported": reported,
             "ignored": ignored,
-            "unread": total - clicked - reported - ignored,
+            "opened": opened,
+            "unread": total - clicked - reported - ignored - opened,
             "awareness_score": awareness_score
         }
     }
@@ -149,6 +151,11 @@ async def remove_campaign(campaign_id: int):
 
 @app.post("/campaigns/action")
 async def record_action(req: ActionRequest):
+    if req.action == "opened":
+        # Never downgrade a click/report/delete back to "opened"
+        if not mark_target_opened(req.target_id):
+            raise HTTPException(404, "Target not found")
+        return {"status": "updated"}
     if not update_target_status(req.target_id, req.action):
         raise HTTPException(404, "Target not found")
     return {"status": "updated"}
@@ -199,7 +206,7 @@ async def auto_simulate(campaign_id: int, req: AutoSimRequest):
     weights = list(probs.values())
     changed = []
     for t in targets:
-        if t['status'] == 'unread':
+        if t['status'] in ('unread', 'opened'):
             action = random.choices(actions, weights=weights)[0]
             update_target_status(t['id'], action)
             changed.append({"target_id": t['id'], "employee_name": t['employee_name'], "action": action})

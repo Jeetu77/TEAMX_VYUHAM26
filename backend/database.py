@@ -76,6 +76,18 @@ def update_target_status(target_id, status):
     conn.close()
     return updated
 
+def mark_target_opened(target_id):
+    """Unread -> opened. Returns False only if the target doesn't exist."""
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    exists = c.execute('SELECT 1 FROM campaign_targets WHERE id=?', (target_id,)).fetchone()
+    if exists:
+        c.execute("UPDATE campaign_targets SET status='opened', updated_at=? WHERE id=? AND status='unread'",
+                  (datetime.now().isoformat(), target_id))
+        conn.commit()
+    conn.close()
+    return bool(exists)
+
 def save_feedback(target_id, feedback):
     conn = sqlite3.connect(DB)
     c = conn.cursor()

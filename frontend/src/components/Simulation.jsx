@@ -115,18 +115,28 @@ function ResultPanel({ kind, redFlags, feedback, loadingFeedback }) {
 
 function InboxModal({ target, email, campaignId, onAction, onClose }) {
   // 'list' -> 'email' -> result ('clicked' | 'reported' | 'ignored')
-  const [view, setView] = useState(target.status === 'unread' ? 'list' : target.status)
+  const acted = ['clicked', 'reported', 'ignored'].includes(target.status)
+  const [view, setView] = useState(acted ? target.status : 'list')
   const [otherMail, setOtherMail] = useState(null)
   const [hoverUrl, setHoverUrl] = useState('')
+  const [read, setRead] = useState(target.status !== 'unread')
   const firstName = target.employee_name.split(' ')[0]
   const [feedback, setFeedback] = useState('')
-  const [loadingFeedback, setLoadingFeedback] = useState(target.status !== 'unread')
+  const [loadingFeedback, setLoadingFeedback] = useState(acted)
 
   // Feedback for an already-acted target opened again
   useEffect(() => {
-    if (target.status !== 'unread') fetchFeedback()
+    if (acted) fetchFeedback()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const openPhish = () => {
+    setView('email')
+    if (!read) {
+      setRead(true)
+      onAction(target.id, 'opened')
+    }
+  }
 
   async function fetchFeedback() {
     setLoadingFeedback(true)
@@ -169,21 +179,21 @@ function InboxModal({ target, email, campaignId, onAction, onClose }) {
           {view === 'list' && !otherMail && (
             <div className="-m-1 divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
               {[OTHER_MAILS[0], 'phish', ...OTHER_MAILS.slice(1)].map(m => m === 'phish' ? (
-                <button key="phish" onClick={() => setView('email')}
-                  className="w-full flex items-center gap-3 px-3.5 py-3 bg-blue-50/40 hover:bg-blue-50 transition text-left">
+                <button key="phish" onClick={openPhish}
+                  className={`w-full flex items-center gap-3 px-3.5 py-3 transition text-left ${read ? 'hover:bg-slate-50' : 'bg-blue-50/40 hover:bg-blue-50'}`}>
                   <div className="w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-bold shrink-0"
                     style={{ background: senderColor(email.sender_display) }}>
                     {email.sender_display?.[0] || '?'}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-bold text-slate-900 text-sm truncate">{email.sender_display}</span>
-                      <span className="text-[11px] text-slate-500 font-semibold shrink-0">9:14 AM</span>
+                      <span className={`text-sm truncate ${read ? 'text-slate-700' : 'font-bold text-slate-900'}`}>{email.sender_display}</span>
+                      <span className={`text-[11px] shrink-0 ${read ? 'text-slate-400' : 'text-slate-500 font-semibold'}`}>9:14 AM</span>
                     </div>
-                    <div className="font-semibold text-sm text-slate-800 truncate">{email.subject}</div>
+                    <div className={`text-sm truncate ${read ? 'text-slate-600' : 'font-semibold text-slate-800'}`}>{email.subject}</div>
                     <div className="text-xs text-slate-400 truncate">{email.body?.replaceAll('{name}', firstName).slice(0, 90)}</div>
                   </div>
-                  <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" title="Unread" />
+                  {!read && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" title="Unread" />}
                 </button>
               ) : (
                 <button key={m.id} onClick={() => setOtherMail(m)}
@@ -331,7 +341,7 @@ export default function Simulation() {
     setAutoRunning(false)
   }
 
-  const unreadCount = detail?.targets?.filter(t => t.status === 'unread').length || 0
+  const unreadCount = detail?.targets?.filter(t => t.status === 'unread' || t.status === 'opened').length || 0
 
   return (
     <div className="space-y-6">
