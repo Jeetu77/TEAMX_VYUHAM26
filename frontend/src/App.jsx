@@ -35,7 +35,7 @@ export default function App() {
           </div>
           <div className="leading-tight">
             <div className="font-semibold text-slate-900 tracking-tight">CyberSafe</div>
-            <div className="hidden md:block text-[10px] text-slate-400 tracking-wide uppercase">Phishing awareness</div>
+            <div className="hidden md:block text-[10px] text-slate-400 tracking-wide uppercase">Cyber Safe Keralam</div>
           </div>
         </div>
         <nav className="flex md:flex-col gap-1 flex-1 overflow-x-auto">

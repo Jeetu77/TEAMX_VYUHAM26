@@ -44,6 +44,9 @@ export default function Home({ onNavigate }) {
           <Shield size={40} className="text-blue-600" />
         </div>
         <h1 className="text-3xl font-bold text-slate-900">CyberSafe</h1>
+        <div className="inline-flex items-center gap-1.5 mt-3 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold tracking-[0.14em] uppercase">
+          Cyber Safe Keralam
+        </div>
         <p className="text-slate-500 mt-3 max-w-xl mx-auto">
           An AI-powered phishing detection and security-awareness trainer.
           Spot scams before they land, and teach your team to do the same —

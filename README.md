@@ -1,4 +1,4 @@
-# 🛡️ CyberSafe
+# 🛡️ CyberSafe — Cyber Safe Keralam
 
 **AI-powered phishing detection and security awareness training.**  
 Spot scams before they land — and teach your team to do the same.
