@@ -11,6 +11,13 @@ const SCENARIOS = [
   'UPI cashback offer',
   'HR payroll portal update',
   'Courier delivery failed',
+  'Income tax refund',
+  'Electricity bill disconnection',
+  'Aadhaar suspension alert',
+  'Lottery / lucky draw win',
+  'CEO urgent gift card request',
+  'WhatsApp part-time job offer',
+  'Credit card reward points expiry',
 ]
 const errMsg = (e) => e.response?.data?.detail || 'Request failed. Check backend is running.'
 

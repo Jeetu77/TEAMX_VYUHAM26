@@ -245,7 +245,7 @@ MESSAGE:<<<{text}>>>"""
 
 _TEMPLATES = [
     {
-        "keys": ["kyc", "sbi", "bank"],
+        "keys": ["kyc", "sbi", "bank", "aadhaar", "credit card", "reward points", "account"],
         "sender": "State Bank of India", "link_text": "Update KYC Now",
         "subject": {"easy": "URGENT: KYC update required - account will be BLOCKED in 24 hrs",
                     "hard": "Action needed: periodic KYC re-verification for your account"},
@@ -260,7 +260,7 @@ _TEMPLATES = [
                   "Pressure to act quickly or lose access", "Banks never ask you to verify KYC through email links"],
     },
     {
-        "keys": ["irctc", "ticket", "refund", "railway"],
+        "keys": ["irctc", "ticket", "refund", "railway", "income tax", "tax", "electricity", "bill"],
         "sender": "IRCTC Refunds", "link_text": "Claim Refund",
         "subject": {"easy": "Your IRCTC refund Rs.1,840 is waiting - claim NOW",
                     "hard": "IRCTC: refund initiated for cancelled ticket (PNR 4827391056)"},
@@ -274,7 +274,7 @@ _TEMPLATES = [
                   "Asks you to re-enter bank details", "Refund framed as expiring"],
     },
     {
-        "keys": ["upi", "cashback", "paytm", "phonepe", "gpay"],
+        "keys": ["upi", "cashback", "paytm", "phonepe", "gpay", "lottery", "lucky draw", "prize", "win"],
         "sender": "PhonePe Rewards", "link_text": "Collect Cashback",
         "subject": {"easy": "You won Rs.5000 CASHBACK!! Collect before it expires",
                     "hard": "Your PhonePe cashback of Rs. 250 is ready"},
@@ -287,7 +287,7 @@ _TEMPLATES = [
                   "Non-PhonePe domain", "Countdown pressure"],
     },
     {
-        "keys": ["hr", "payroll", "salary", "portal"],
+        "keys": ["hr", "payroll", "salary", "portal", "ceo", "gift card", "job", "offer", "part-time", "registration fee"],
         "sender": "HR Payroll Team", "link_text": "Open Payroll Portal",
         "subject": {"easy": "Payroll portal LOGIN REQUIRED - salary on hold",
                     "hard": "Updated payroll details for this month - please review"},
