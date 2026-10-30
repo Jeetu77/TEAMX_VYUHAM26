@@ -5,9 +5,10 @@ from typing import List, Literal
 from database import init_db, save_analysis, create_campaign, \
     get_campaign, update_target_status, get_all_campaigns, save_feedback, \
     get_analyses, get_analysis_stats, delete_campaign, get_employee_stats
-from analyzer import analyze, generate_phishing_email, generate_feedback, MOCK, get_usage
+from analyzer import (analyze, analyze_image, generate_phishing_email, generate_feedback,
+                      MOCK, get_usage, AIUnavailable, NoMessageFound)
 from quiz import get_quiz
-import random
+import random, base64, binascii
 
 app = FastAPI(title="CyberSafe API")
 
@@ -46,6 +47,49 @@ async def analyze_message(req: AnalyzeRequest):
     result = _ai_call(analyze, req.text)
     save_analysis(req.text, result)
     return result
+
+class ImageRequest(BaseModel):
+    image_base64: str
+
+
+MAX_IMAGE_BYTES = 5 * 1024 * 1024  # Claude's per-image limit
+
+
+def _sniff_image(raw: bytes):
+    if raw.startswith(b"\xff\xd8\xff"):
+        return "image/jpeg"
+    if raw.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if raw[:4] == b"RIFF" and raw[8:12] == b"WEBP":
+        return "image/webp"
+    if raw[:4] == b"GIF8":
+        return "image/gif"
+    return None
+
+
+@app.post("/analyze/image")
+async def analyze_screenshot(req: ImageRequest):
+    data = req.image_base64.split(",", 1)[-1].strip()  # tolerate a data: URL prefix
+    try:
+        raw = base64.b64decode(data, validate=True)
+    except (binascii.Error, ValueError):
+        raise HTTPException(400, "Image is not valid base64")
+    if len(raw) > MAX_IMAGE_BYTES:
+        raise HTTPException(413, "Image is larger than 5 MB")
+    media_type = _sniff_image(raw)
+    if not media_type:
+        raise HTTPException(400, "Unsupported image. Use a PNG, JPEG, WebP or GIF screenshot")
+    try:
+        result = analyze_image(data, media_type)
+    except AIUnavailable as e:
+        raise HTTPException(503, str(e))
+    except NoMessageFound as e:
+        raise HTTPException(422, str(e))
+    except Exception as e:
+        raise HTTPException(502, f"AI request failed: {e}")
+    save_analysis("[screenshot] " + result["extracted_text"], result)
+    return result
+
 
 @app.get("/analyses")
 async def list_analyses(limit: int = 50):
@@ -131,8 +175,8 @@ async def employee_stats():
 
 # --- QUIZ ---
 @app.get("/quiz")
-async def quiz(n: int = 6):
-    return get_quiz(n)
+async def quiz(n: int = 6, topic: Literal["all", "kerala"] = "all"):
+    return get_quiz(n, topic)
 
 # --- AUTO-SIMULATE ---
 # Probability of each action per difficulty (how convincing the email is)

@@ -105,13 +105,14 @@ export default function Quiz() {
   const [error, setError] = useState('')
   const [name, setName] = useState('')
   const [started, setStarted] = useState(false)
+  const [topic, setTopic] = useState('all')
 
   const load = useCallback(() => {
     setQuestions(null); setIdx(0); setAnswer(null); setScore(0); setFinished(false); setError('')
-    getQuiz(6)
+    getQuiz(6, topic)
       .then(r => setQuestions(r.data))
       .catch(() => setError('Could not load quiz. Check backend is running.'))
-  }, [])
+  }, [topic])
 
   useEffect(() => { load() }, [load])
 
@@ -142,6 +143,20 @@ export default function Quiz() {
           {questions.length} real-world messages — call each one phishing or legitimate.
           Finish the quiz to earn a certificate with your name on it.
         </p>
+        <div className="flex gap-2 justify-center mb-5">
+          {[['all', 'Mixed scams'], ['kerala', 'Kerala local scams']].map(([id, label]) => (
+            <button key={id} type="button" onClick={() => setTopic(id)}
+              className={`text-xs px-3 py-1.5 rounded-full border transition
+                ${topic === id ? 'bg-blue-50 border-blue-300 text-blue-700 font-semibold' : 'border-slate-300 text-slate-500 hover:border-blue-300'}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+        {topic === 'kerala' && (
+          <p className="text-xs text-slate-400 -mt-2 mb-4">
+            KSEB bill threats, fake e-challans, customs-parcel calls and loan-app harassment.
+          </p>
+        )}
         <form onSubmit={e => { e.preventDefault(); if (name.trim()) setStarted(true) }}>
           <label className="text-sm text-slate-500 block text-left">Your name (for the certificate)</label>
           <input value={name} onChange={e => setName(e.target.value)}

@@ -102,16 +102,90 @@ QUIZ_BANK = [
         "red_flags": [],
         "explanation": "Legitimate: official domain, directs you into the app you already have rather than a link, and explicitly reminds you it never asks for PIN/OTP.",
     },
+    # ---- Kerala local scam library ----
+    {
+        "id": 13, "topic": "kerala", "is_phish": True,
+        "sender": "+91 9xxxxxxx45 (SMS)",
+        "subject": "KSEB bill pending - supply will be cut",
+        "body": "Dear KSEB consumer, your bill of Rs 3,112 is pending. Power supply will be disconnected tonight. Pay now at http://kseb-billpay.example/pay or call the officer 9xxxxxxx45.",
+        "red_flags": ["Sent from a personal mobile number, not an official sender", "Threat of same-night disconnection", "Payment link is not the official kseb.in site", "Asks you to phone an 'officer' directly"],
+        "explanation": "A very common Kerala scam. KSEB does not cut power the same night over an SMS. If a bill worries you, check it yourself on the official KSEB website or app, or at your local section office.",
+    },
+    {
+        "id": 14, "topic": "kerala", "is_phish": False,
+        "sender": "KSEB Ltd <noreply@kseb.in>",
+        "subject": "Your electricity bill for October is generated",
+        "body": "Dear consumer, the bill for consumer number ending 4821 for October is Rs 842, due on 25-Nov. You can pay through the official KSEB website or app, or at your local section office. KSEB staff never ask for payment to a personal number.",
+        "red_flags": [],
+        "explanation": "Legitimate pattern: official domain, shows partial consumer details, gives a reasonable due date, and points you to channels you open yourself rather than a pressure link.",
+    },
+    {
+        "id": 15, "topic": "kerala", "is_phish": True,
+        "sender": "VAHAN-ALERT (SMS)",
+        "subject": "Pending traffic challan",
+        "body": "Your vehicle KL-07-XX-1234 has an unpaid e-challan of Rs 500. Pay within 24 hours to avoid court notice and licence suspension: http://mvd-echallan-pay.example/KL07. Install the app from this link for details.",
+        "red_flags": ["Court and licence threat with a 24-hour deadline", "Payment link is not the official parivahan.gov.in portal", "Asks you to install an app from a link in an SMS", "Does not name the offence, date or location"],
+        "explanation": "Fake e-challan messages often push you to install an APK that can read your SMS and OTPs. Real challans list the offence, place and time; check yours by typing the official e-challan portal address yourself.",
+    },
+    {
+        "id": 16, "topic": "kerala", "is_phish": False,
+        "sender": "Motor Vehicles Department notice",
+        "subject": "Traffic violation notice for KL-07-XX-1234",
+        "body": "A violation was recorded on 12-Oct at 4:15 PM near MG Road junction (signal jump). Details and payment options are available on the official e-challan portal of the Government of India. Please open the portal yourself and enter your vehicle number. Do not pay through links in messages.",
+        "red_flags": [],
+        "explanation": "This one gives the date, time and place of a specific offence and sends you to the official portal to look it up yourself, with no link, app or threat.",
+    },
+    {
+        "id": 17, "topic": "kerala", "is_phish": True,
+        "sender": "Phone call + video call (caller says 'Customs / CBI')",
+        "subject": "Customs parcel in your name - arrest warning",
+        "body": "This is Customs. A parcel booked in your name from abroad contains illegal items and a case is registered. To avoid arrest you must stay on this video call, tell nobody, and transfer a refundable security deposit to the verification account we will share.",
+        "red_flags": ["Agencies never arrest or investigate over a phone or video call", "Demands you keep the call going and tell no one", "Asks for a 'refundable deposit' to a private account", "You never sent or expected such a parcel"],
+        "explanation": "This is the 'digital arrest' scam. No agency holds people on video calls or collects money to clear a case. Hang up, speak to family, and report it on 1930 or cybercrime.gov.in.",
+    },
+    {
+        "id": 18, "topic": "kerala", "is_phish": True,
+        "sender": "WhatsApp message from unknown number",
+        "subject": "Gift parcel held at customs",
+        "body": "Hello, I sent you a gift parcel from the UK with jewellery and a phone. It is held at Cochin customs. Pay Rs 18,500 clearance fee today to this UPI id to release it: clearance.cus@ybl",
+        "red_flags": ["Unknown sender claims to have sent you a gift", "Customs fee demanded to a personal UPI id", "Same-day deadline", "Valuable gift from a stranger"],
+        "explanation": "A romance-and-gift variant of the customs scam. Genuine customs duty is never collected through a personal UPI id, and strangers do not send expensive gifts.",
+    },
+    {
+        "id": 19, "topic": "kerala", "is_phish": True,
+        "sender": "+91 8xxxxxxxxx (SMS from instant-loan app)",
+        "subject": "Loan overdue - final warning",
+        "body": "Your instant loan of Rs 5,000 is overdue. Repay Rs 9,800 today or we will send your photos and loan details to everyone in your contacts and call your family and employer.",
+        "red_flags": ["Repayment far above the amount borrowed", "Threatens to message your contacts and family", "Uses your phone contacts and photos as leverage", "Pressure to pay the same day"],
+        "explanation": "Predatory loan apps copy your contacts and gallery, then harass borrowers. Do not pay under threat, do not install such apps, and report harassment on 1930 or cybercrime.gov.in.",
+    },
+    {
+        "id": 20, "topic": "kerala", "is_phish": True,
+        "sender": "Quick Cash Loans <offers@fastloan-approved.example>",
+        "subject": "Pre-approved loan of Rs 50,000 - no documents",
+        "body": "You are pre-approved for Rs 50,000 with no documents or credit check. Pay a processing fee of Rs 1,500 now to release the amount. Download our app to continue.",
+        "red_flags": ["Asks for a fee before any money is paid out", "No documents or credit check", "Unsolicited pre-approval", "Pushes an app install"],
+        "explanation": "Regulated lenders do not take an upfront fee before disbursing and do not approve loans without checks. Verify any lender on the RBI website before installing its app.",
+    },
+    {
+        "id": 21, "topic": "kerala", "is_phish": False,
+        "sender": "Your Bank <alerts@yourbank.example>",
+        "subject": "EMI reminder: due on 5 November",
+        "body": "Dear Anitha, your EMI of Rs 4,250 for loan account ending 7712 is due on 5-Nov. Please keep the amount in your account. You can also pay in the bank's official app or at your branch. This is an automated reminder.",
+        "red_flags": [],
+        "explanation": "A normal reminder: names you, gives the exact amount and a sensible due date, shows only the last digits of the account, makes no threats and asks for nothing unusual.",
+    },
 ]
 
 
-def get_quiz(n: int = 6) -> list:
-    n = max(2, min(n, len(QUIZ_BANK)))
-    questions = random.sample(QUIZ_BANK, n)
+def get_quiz(n: int = 6, topic: str = "all") -> list:
+    pool = [q for q in QUIZ_BANK if q.get("topic") == topic] if topic != "all" else QUIZ_BANK
+    n = max(2, min(n, len(pool)))
+    questions = random.sample(pool, n)
     # Keep a balanced mix: at least one of each kind when possible
     if all(q["is_phish"] for q in questions):
-        questions[-1] = random.choice([q for q in QUIZ_BANK if not q["is_phish"]])
+        questions[-1] = random.choice([q for q in pool if not q["is_phish"]])
     elif not any(q["is_phish"] for q in questions):
-        questions[-1] = random.choice([q for q in QUIZ_BANK if q["is_phish"]])
+        questions[-1] = random.choice([q for q in pool if q["is_phish"]])
     random.shuffle(questions)
     return questions

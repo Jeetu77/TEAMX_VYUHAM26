@@ -61,12 +61,14 @@ Track awareness scores across all campaigns on a bar chart. Export any campaign 
 | Feature | Details |
 |---|---|
 | Rule engine | Urgency keywords, lookalike domains, raw-IP URLs, OTP/credential requests, prompt-injection detection |
+| Screenshot analysis | Drop, browse or Ctrl+V a WhatsApp/SMS screenshot; Claude vision reads the text, then the same rule engine, URL reputation and verdict apply. Needs live AI (one API call per image) |
 | URL reputation | Links are checked against the live OpenPhish feed (no key needed); add `VIRUSTOTAL_API_KEY` in `.env` for an optional second opinion. Uses no Claude credits |
 | AI analysis | Claude (Haiku) names each social-engineering tactic with evidence from the message |
 | Mock mode | Works fully offline without an API key — rule-based verdicts only |
 | Simulation | Generate a phishing email for any scenario, send to simulated inboxes, record clicks/reports/ignores |
 | Auto-simulate | One click runs the whole campaign with probability-weighted employee behaviour |
-| Training quiz | 12-question bank of Indian scam patterns; random 6-question rounds |
+| Training quiz | 21-question bank of Indian scam patterns; random 6-question rounds |
+| Kerala scam library | Pick "Kerala local scams" in the quiz for KSEB bill threats, fake MVD e-challans, customs-parcel ("digital arrest") calls and loan-app harassment, with matching Simulation scenarios |
 | Certificate | Canvas-drawn PNG with the learner's name, score and date — no backend needed |
 | Dashboard | Bar chart of awareness scores per campaign; CSV export |
 | History | Every analyzed message with verdict, confidence, impersonated brand and full tactics list |

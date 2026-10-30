@@ -18,6 +18,10 @@ const SCENARIOS = [
   'CEO urgent gift card request',
   'WhatsApp part-time job offer',
   'Credit card reward points expiry',
+  'KSEB electricity bill threat',
+  'Fake MVD e-challan',
+  'Customs parcel call',
+  'Loan-app harassment',
 ]
 const errMsg = (e) => e.response?.data?.detail || 'Request failed. Check backend is running.'
 

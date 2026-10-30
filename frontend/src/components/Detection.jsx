@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Search, Zap, Brain, Building2 } from 'lucide-react'
-import { analyzeMessage } from '../api'
+import { useState, useEffect, useRef } from 'react'
+import { Search, Zap, Brain, Building2, FileText, Image as ImageIcon, Upload, X, ScanText } from 'lucide-react'
+import { analyzeMessage, analyzeScreenshot } from '../api'
 import { card, VERDICT, SectionTitle, ErrorNote, btnPrimary, btnGhost } from '../ui'
 
 const SEVERITY_COLOR = {
@@ -15,17 +15,68 @@ const SAMPLES = [
   { label: 'Legit email', text: `Hi, your Amazon order #402-123 has shipped and will arrive tomorrow. Track at amazon.in/orders. No action needed.` },
 ]
 
+const MAX_SIDE = 1600
+
+// Shrink screenshots in the browser: faster upload and fewer vision tokens
+function shrinkImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#fff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      URL.revokeObjectURL(url)
+      resolve(canvas.toDataURL('image/jpeg', 0.9))
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')) }
+    img.src = url
+  })
+}
+
 export default function Detection() {
+  const [mode, setMode] = useState('text')   // 'text' | 'shot'
   const [text, setText] = useState('')
+  const [shot, setShot] = useState(null)     // data URL of the shrunk screenshot
+  const [dragging, setDragging] = useState(false)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const fileRef = useRef(null)
+
+  const loadFile = async (file) => {
+    if (!file || !file.type.startsWith('image/')) { setError('Please choose an image file (PNG, JPG, WebP).'); return }
+    try {
+      setShot(await shrinkImage(file)); setError(''); setResult(null)
+    } catch {
+      setError('Could not read that image.')
+    }
+  }
+
+  // Ctrl+V a screenshot straight into the page
+  useEffect(() => {
+    if (mode !== 'shot') return
+    const onPaste = (e) => {
+      const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'))
+      if (item) { e.preventDefault(); loadFile(item.getAsFile()) }
+    }
+    window.addEventListener('paste', onPaste)
+    return () => window.removeEventListener('paste', onPaste)
+  }, [mode])
+
+  const switchMode = (m) => { setMode(m); setError(''); setResult(null) }
+  const ready = mode === 'text' ? !!text.trim() : !!shot
 
   const analyze = async () => {
-    if (!text.trim()) return
+    if (!ready) return
     setLoading(true); setError(''); setResult(null)
     try {
-      const res = await analyzeMessage(text)
+      const res = mode === 'text' ? await analyzeMessage(text) : await analyzeScreenshot(shot)
       setResult(res.data)
     } catch (e) {
       setError(e.response?.data?.detail || 'Analysis failed. Check backend is running.')
@@ -43,21 +94,57 @@ export default function Detection() {
       <div className="grid lg:grid-cols-2 gap-6 items-start">
         {/* Input column */}
         <div className="space-y-4">
-          <div className="flex gap-2 flex-wrap">
-            {SAMPLES.map(s => (
-              <button key={s.label} onClick={() => setText(s.text)} className={btnGhost}>
-                {s.label}
+          <div className="inline-flex p-1 rounded-lg bg-white/10 border border-white/15 gap-1">
+            {[['text', 'Paste text', FileText], ['shot', 'Upload screenshot', ImageIcon]].map(([id, label, Icon]) => (
+              <button key={id} onClick={() => switchMode(id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition
+                  ${mode === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-300 hover:text-white'}`}>
+                <Icon size={14} /> {label}
               </button>
             ))}
           </div>
 
-          <textarea value={text} onChange={e => setText(e.target.value)}
-            placeholder="Paste suspicious message here..."
-            className={`${card} w-full h-52 p-4 text-sm text-slate-800 placeholder-slate-400
-              focus:outline-none focus:border-blue-500 resize-none bg-white`} />
+          {mode === 'text' ? (
+            <>
+              <div className="flex gap-2 flex-wrap">
+                {SAMPLES.map(s => (
+                  <button key={s.label} onClick={() => setText(s.text)} className={btnGhost}>
+                    {s.label}
+                  </button>
+                ))}
+              </div>
 
-          <button onClick={analyze} disabled={loading || !text.trim()} className={btnPrimary}>
-            <Search size={15} /> {loading ? 'Analyzing…' : 'Analyze message'}
+              <textarea value={text} onChange={e => setText(e.target.value)}
+                placeholder="Paste suspicious message here..."
+                className={`${card} w-full h-52 p-4 text-sm text-slate-800 placeholder-slate-400
+                  focus:outline-none focus:border-blue-500 resize-none bg-white`} />
+            </>
+          ) : shot ? (
+            <div className={`${card} p-3 relative`}>
+              <img src={shot} alt="Screenshot to analyze" className="w-full max-h-72 object-contain rounded-lg bg-slate-50" />
+              <button onClick={() => { setShot(null); setResult(null) }} title="Remove screenshot"
+                className="absolute top-5 right-5 p-1.5 rounded-full bg-slate-900/70 text-white hover:bg-slate-900 transition">
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <div onClick={() => fileRef.current?.click()}
+              onDragOver={e => { e.preventDefault(); setDragging(true) }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={e => { e.preventDefault(); setDragging(false); loadFile(e.dataTransfer.files?.[0]) }}
+              className={`${card} h-52 flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition
+                border-2 border-dashed ${dragging ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400'}`}>
+              <Upload size={26} className="text-blue-600" />
+              <div className="text-sm font-medium text-slate-800">Drop a WhatsApp or SMS screenshot here</div>
+              <div className="text-xs text-slate-500">or click to browse, or press Ctrl+V to paste</div>
+            </div>
+          )}
+          <input ref={fileRef} type="file" accept="image/*" className="hidden"
+            onChange={e => { loadFile(e.target.files?.[0]); e.target.value = '' }} />
+
+          <button onClick={analyze} disabled={loading || !ready} className={btnPrimary}>
+            {mode === 'text' ? <Search size={15} /> : <ScanText size={15} />}
+            {loading ? (mode === 'text' ? 'Analyzing…' : 'Reading screenshot…') : (mode === 'text' ? 'Analyze message' : 'Analyze screenshot')}
           </button>
 
           <ErrorNote>{error}</ErrorNote>
@@ -93,6 +180,15 @@ export default function Detection() {
                 </div>
               )}
               <p className="text-sm text-slate-400 border-t border-slate-200 pt-3">{result.recommended_action}</p>
+            </div>
+          )}
+
+          {result?.extracted_text && (
+            <div className={`${card} p-5`}>
+              <h3 className="flex items-center gap-2 font-semibold mb-2 text-slate-800">
+                <ScanText size={15} className="text-blue-600" /> Text read from screenshot
+              </h3>
+              <pre className="text-xs text-slate-600 whitespace-pre-wrap font-sans bg-slate-50 rounded-lg p-3 border border-slate-200 max-h-40 overflow-y-auto">{result.extracted_text}</pre>
             </div>
           )}
 
