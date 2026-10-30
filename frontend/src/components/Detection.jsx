@@ -94,11 +94,11 @@ export default function Detection() {
       <div className="grid lg:grid-cols-2 gap-6 items-start">
         {/* Input column */}
         <div className="space-y-4">
-          <div className="inline-flex p-1 rounded-lg bg-white/10 border border-white/15 gap-1">
+          <div className="inline-flex p-1 rounded-lg bg-slate-100 border border-slate-200 gap-1">
             {[['text', 'Paste text', FileText], ['shot', 'Upload screenshot', ImageIcon]].map(([id, label, Icon]) => (
               <button key={id} onClick={() => switchMode(id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition
-                  ${mode === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-300 hover:text-white'}`}>
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200
+                  ${mode === id ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
                 <Icon size={14} /> {label}
               </button>
             ))}

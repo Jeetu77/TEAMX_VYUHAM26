@@ -40,11 +40,11 @@ export default function Home({ onNavigate }) {
     <div className="space-y-10">
       {/* Hero */}
       <div className="text-center pt-6 pb-2">
-        <div className="inline-flex p-4 rounded-2xl bg-blue-500/15 border border-blue-400/30 mb-5 shadow-[0_0_30px_rgba(59,130,246,0.3)]">
-          <Shield size={40} className="text-blue-300" />
+        <div className="inline-flex p-4 rounded-2xl bg-blue-50 border border-blue-100 mb-5 shadow-[0_4px_16px_rgba(59,130,246,0.15)]">
+          <Shield size={40} className="text-blue-600" />
         </div>
-        <h1 className="text-3xl font-bold text-white drop-shadow-md">CyberSafe</h1>
-        <p className="text-slate-300 mt-3 max-w-xl mx-auto">
+        <h1 className="text-3xl font-bold text-slate-900">CyberSafe</h1>
+        <p className="text-slate-500 mt-3 max-w-xl mx-auto">
           An AI-powered phishing detection and security-awareness trainer.
           Spot scams before they land, and teach your team to do the same —
           without a single real email leaving the building.
@@ -56,11 +56,11 @@ export default function Home({ onNavigate }) {
 
       {/* Modules */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">What you can do</h2>
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">What you can do</h2>
         <div className="grid md:grid-cols-2 gap-4">
           {MODULES.map(m => (
             <button key={m.id} onClick={() => onNavigate(m.id)}
-              className={`${card} p-5 text-left hover:border-blue-300 hover:shadow transition group`}>
+              className={`${card} p-5 text-left hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out group`}>
               <div className="inline-flex p-2 rounded-lg bg-blue-50 border border-blue-100 mb-3">
                 <m.Icon size={18} className="text-blue-600" />
               </div>
@@ -76,7 +76,7 @@ export default function Home({ onNavigate }) {
 
       {/* How it works */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">How it works</h2>
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">How it works</h2>
         <div className="grid md:grid-cols-3 gap-4">
           {HOW.map(h => (
             <div key={h.title} className={`${card} p-5`}>

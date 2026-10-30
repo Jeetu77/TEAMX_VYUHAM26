@@ -1,7 +1,7 @@
 // Shared UI primitives + status/verdict styling, used across all screens.
 import { ShieldAlert, ShieldQuestion, ShieldCheck, MousePointerClick, Flag, Eye, Mail } from 'lucide-react'
 
-export const card = 'bg-white/90 backdrop-blur-xl border border-white/60 rounded-xl shadow-[0_8px_30px_rgba(2,12,27,0.35)]'
+export const card = 'bg-white border border-slate-200/80 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] transition-shadow duration-200'
 
 export const VERDICT = {
   phishing:    { label: 'Phishing',    Icon: ShieldAlert,    text: 'text-rose-600',    chip: 'bg-rose-50 text-rose-700 border-rose-200',       bar: 'bg-rose-500' },
@@ -39,8 +39,8 @@ export function StatCard({ label, value, accent = 'text-slate-900', sub }) {
 export function SectionTitle({ title, subtitle }) {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-white drop-shadow-sm">{title}</h2>
-      {subtitle && <p className="text-sm text-slate-300 mt-1">{subtitle}</p>}
+      <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
+      {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
     </div>
   )
 }
@@ -50,6 +50,6 @@ export function ErrorNote({ children }) {
   return <div className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{children}</div>
 }
 
-export const inputCls = 'w-full mt-1.5 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
-export const btnPrimary = 'inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:pointer-events-none rounded-lg text-sm font-semibold text-white transition'
-export const btnGhost = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-600 transition'
+export const inputCls = 'w-full mt-1.5 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200/60 transition-all duration-200'
+export const btnPrimary = 'inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none rounded-lg text-sm font-semibold text-white shadow-[0_1px_3px_rgba(37,99,235,0.3)] hover:shadow-[0_4px_12px_rgba(37,99,235,0.35)] transition-all duration-200 ease-out'
+export const btnGhost = 'inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-lg text-xs text-slate-600 active:scale-[0.98] transition-all duration-200'
