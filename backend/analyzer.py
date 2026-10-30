@@ -6,6 +6,7 @@ import re
 from urllib.parse import urlparse
 
 load_dotenv()
+from reputation import check_urls
 MOCK = os.getenv("MOCK_AI", "false").lower() == "true"
 MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-5-5")
 DAILY_LIMIT = int(os.getenv("DAILY_API_LIMIT", "30"))  # 0 = unlimited
@@ -144,6 +145,9 @@ def run_rules(text: str) -> list:
         if len(parts) > 4:
             findings.append({"rule": "suspicious_subdomain",
                 "detail": f"Excessive subdomains in: {domain}", "severity": "medium"})
+
+    # Threat-intel reputation (OpenPhish feed, optional VirusTotal)
+    findings.extend(check_urls(urls))
 
     # OTP / credential request
     if any(_has_word(text_lower, w) for w in CREDENTIAL_WORDS):

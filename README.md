@@ -61,6 +61,7 @@ Track awareness scores across all campaigns on a bar chart. Export any campaign 
 | Feature | Details |
 |---|---|
 | Rule engine | Urgency keywords, lookalike domains, raw-IP URLs, OTP/credential requests, prompt-injection detection |
+| URL reputation | Links are checked against the live OpenPhish feed (no key needed); add `VIRUSTOTAL_API_KEY` in `.env` for an optional second opinion. Uses no Claude credits |
 | AI analysis | Claude (Haiku) names each social-engineering tactic with evidence from the message |
 | Mock mode | Works fully offline without an API key — rule-based verdicts only |
 | Simulation | Generate a phishing email for any scenario, send to simulated inboxes, record clicks/reports/ignores |
