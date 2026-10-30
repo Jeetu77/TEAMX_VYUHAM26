@@ -45,8 +45,10 @@ def _virustotal(url: str):
                       headers={"x-apikey": VT_KEY}, timeout=TIMEOUT)
         if r.status_code == 200:
             stats = r.json()["data"]["attributes"]["last_analysis_stats"]
+        elif r.status_code != 404:
+            return None  # quota/auth/transient error: don't cache, retry next time
     except Exception:
-        pass
+        return None
     _vt_cache[url] = stats
     return stats
 

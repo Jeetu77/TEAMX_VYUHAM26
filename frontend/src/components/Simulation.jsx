@@ -18,23 +18,38 @@ const findUrl = (text) => text?.match(/https?:\/\/[^\s)\]]+/)?.[0]
 
 /* ---------- Realistic inbox simulator (modal) ---------- */
 
-function EmailBody({ body, onClickLink }) {
-  const url = findUrl(body)
-  if (!url) return <p className="text-sm text-slate-700 whitespace-pre-wrap">{body}</p>
-  const [before, ...rest] = body.split(url)
+const OTHER_MAILS = [
+  { id: 'o1', from: 'Anita (Finance)', time: '8:02 AM',
+    subject: 'Reminder: submit Q4 expense reports by Friday',
+    body: 'Hi all,\n\nA quick reminder to submit your Q4 expense reports through the usual finance form by Friday evening. Ping me if you need help with a receipt.\n\nThanks,\nAnita' },
+  { id: 'o2', from: 'Office Admin', time: 'Yesterday',
+    subject: 'Parking pass renewal - Basement B2',
+    body: 'Hello,\n\nParking passes for Basement B2 are due for renewal this month. Please visit the admin desk on the ground floor with your old pass.\n\nOffice Admin' },
+  { id: 'o3', from: 'Rohit Verma', time: 'Yesterday',
+    subject: 'Notes from Monday standup',
+    body: 'Team,\n\nNotes from standup:\n- Release candidate goes out Thursday\n- Please close your open review requests\n- Retro moved to 4 PM\n\nRohit' },
+  { id: 'o4', from: 'Facilities', time: 'Mon',
+    subject: 'Scheduled power maintenance - Saturday 10 PM',
+    body: 'Hi everyone,\n\nThe building will have scheduled power maintenance on Saturday from 10 PM to 2 AM. Please shut down desktops before leaving on Friday.\n\nFacilities Team' },
+]
+
+const senderColor = (s = '') =>
+  `hsl(${[...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7)} 55% 38%)`
+
+function EmailBody({ body, linkText, firstName, onClickLink, onHover }) {
+  const text = body.replaceAll('{name}', firstName)
+  const url = findUrl(text)
+  if (!url) return <p className="text-sm text-slate-700 whitespace-pre-wrap">{text}</p>
+  const [before, ...rest] = text.split(url)
   return (
-    <div className="text-sm text-slate-700 whitespace-pre-wrap">
+    <div className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
       {before}
-      <span className="relative group inline">
-        <button onClick={onClickLink}
-          className="text-blue-600 underline decoration-blue-300 hover:decoration-blue-600 break-all">
-          {url}
-        </button>
-        <span className="pointer-events-none absolute left-0 -bottom-7 z-10 hidden group-hover:block
-          bg-slate-800 text-slate-100 text-[11px] px-2 py-1 rounded whitespace-nowrap shadow-lg">
-          Goes to: {url}
-        </span>
-      </span>
+      <button onClick={onClickLink}
+        onMouseEnter={() => onHover(url)} onMouseLeave={() => onHover('')}
+        onFocus={() => onHover(url)} onBlur={() => onHover('')}
+        className="inline-block my-1 px-5 py-2.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition">
+        {linkText || url}
+      </button>
       {rest.join(url)}
     </div>
   )
@@ -90,6 +105,9 @@ function ResultPanel({ kind, redFlags, feedback, loadingFeedback }) {
 function InboxModal({ target, email, campaignId, onAction, onClose }) {
   // 'list' -> 'email' -> result ('clicked' | 'reported' | 'ignored')
   const [view, setView] = useState(target.status === 'unread' ? 'list' : target.status)
+  const [otherMail, setOtherMail] = useState(null)
+  const [hoverUrl, setHoverUrl] = useState('')
+  const firstName = target.employee_name.split(' ')[0]
   const [feedback, setFeedback] = useState('')
   const [loadingFeedback, setLoadingFeedback] = useState(target.status !== 'unread')
 
@@ -112,14 +130,20 @@ function InboxModal({ target, email, campaignId, onAction, onClose }) {
 
   const act = async (action) => {
     setView(action)
+    setHoverUrl('')
     await onAction(target.id, action)
     fetchFeedback()
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
         onClick={e => e.stopPropagation()}>
+        {hoverUrl && (
+          <div className="absolute left-0 bottom-0 z-20 max-w-full truncate bg-slate-100 border-t border-r border-slate-300 text-slate-700 text-[11px] px-2.5 py-1 rounded-tr-md">
+            {hoverUrl}
+          </div>
+        )}
         {/* Window chrome */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 bg-slate-50">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
@@ -131,42 +155,91 @@ function InboxModal({ target, email, campaignId, onAction, onClose }) {
         </div>
 
         <div className="p-5 overflow-y-auto">
-          {view === 'list' && (
-            <button onClick={() => setView('email')}
-              className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50/40 transition text-left">
-              <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">
-                {email.sender_display?.[0] || '?'}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-semibold text-slate-900 text-sm truncate">{email.sender_display}</span>
-                  <span className="text-[11px] text-slate-400 shrink-0">9:14 AM</span>
-                </div>
-                <div className="font-medium text-sm text-slate-800 truncate">{email.subject}</div>
-                <div className="text-xs text-slate-400 truncate">{email.body?.slice(0, 90)}</div>
-              </div>
-              <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" title="Unread" />
-            </button>
+          {view === 'list' && !otherMail && (
+            <div className="-m-1 divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+              {[OTHER_MAILS[0], 'phish', ...OTHER_MAILS.slice(1)].map(m => m === 'phish' ? (
+                <button key="phish" onClick={() => setView('email')}
+                  className="w-full flex items-center gap-3 px-3.5 py-3 bg-blue-50/40 hover:bg-blue-50 transition text-left">
+                  <div className="w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-bold shrink-0"
+                    style={{ background: senderColor(email.sender_display) }}>
+                    {email.sender_display?.[0] || '?'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="font-bold text-slate-900 text-sm truncate">{email.sender_display}</span>
+                      <span className="text-[11px] text-slate-500 font-semibold shrink-0">9:14 AM</span>
+                    </div>
+                    <div className="font-semibold text-sm text-slate-800 truncate">{email.subject}</div>
+                    <div className="text-xs text-slate-400 truncate">{email.body?.replaceAll('{name}', firstName).slice(0, 90)}</div>
+                  </div>
+                  <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" title="Unread" />
+                </button>
+              ) : (
+                <button key={m.id} onClick={() => setOtherMail(m)}
+                  className="w-full flex items-center gap-3 px-3.5 py-3 hover:bg-slate-50 transition text-left">
+                  <div className="w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-bold shrink-0"
+                    style={{ background: senderColor(m.from) }}>
+                    {m.from[0]}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-sm text-slate-700 truncate">{m.from}</span>
+                      <span className="text-[11px] text-slate-400 shrink-0">{m.time}</span>
+                    </div>
+                    <div className="text-sm text-slate-600 truncate">{m.subject}</div>
+                    <div className="text-xs text-slate-400 truncate">{m.body.replace(/\n+/g, ' ').slice(0, 90)}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {view === 'list' && otherMail && (
+            <div className="space-y-3">
+              <button onClick={() => setOtherMail(null)}
+                className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition">
+                <ArrowLeft size={13} /> Back to inbox
+              </button>
+              <h3 className="text-base font-semibold text-slate-900">{otherMail.subject}</h3>
+              <div className="text-xs text-slate-500">{otherMail.from} · {otherMail.time}</div>
+              <p className="text-sm text-slate-700 whitespace-pre-wrap border-t border-slate-200 pt-3">{otherMail.body}</p>
+            </div>
           )}
 
           {view === 'email' && (
             <div className="space-y-4">
+              <button onClick={() => { setView('list'); setHoverUrl('') }}
+                className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition">
+                <ArrowLeft size={13} /> Back to inbox
+              </button>
               <div>
                 <h3 className="text-base font-semibold text-slate-900">{email.subject}</h3>
                 <div className="flex items-center gap-2.5 mt-2.5">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold">
+                  <div className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-bold"
+                    style={{ background: senderColor(email.sender_display) }}>
                     {email.sender_display?.[0] || '?'}
                   </div>
                   <div className="text-xs">
                     <div className="font-medium text-slate-800">{email.sender_display}</div>
                     <div className="text-slate-400">&lt;{email.sender_email}&gt; · to me</div>
                   </div>
+                  <span className="ml-auto text-[11px] text-slate-400 self-start">9:14 AM</span>
                 </div>
               </div>
-              <div className="border-t border-slate-200 pt-4">
-                <EmailBody body={email.body} onClickLink={() => act('clicked')} />
+              <div className="border border-slate-200 rounded-lg overflow-hidden">
+                <div className="px-5 py-3 text-white font-semibold text-sm tracking-wide"
+                  style={{ background: senderColor(email.sender_display) }}>
+                  {email.sender_display}
+                </div>
+                <div className="p-5">
+                  <EmailBody body={email.body} linkText={email.link_text} firstName={firstName}
+                    onClickLink={() => act('clicked')} onHover={setHoverUrl} />
+                </div>
+                <div className="px-5 py-3 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-400">
+                  This is an automated message. Please do not reply to this email.
+                </div>
               </div>
-              <div className="border-t border-slate-200 pt-3 flex gap-2 flex-wrap">
+              <div className="pt-1 flex gap-2 flex-wrap">
                 <button onClick={() => act('reported')}
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition">
                   <FlagIcon size={13} /> Report phishing
@@ -176,7 +249,7 @@ function InboxModal({ target, email, campaignId, onAction, onClose }) {
                   <Trash2 size={13} /> Delete
                 </button>
                 <span className="ml-auto text-[11px] text-slate-400 self-center">
-                  Tip: hover the link before deciding
+                  Tip: hover over the button to see where it really goes
                 </span>
               </div>
             </div>
@@ -304,8 +377,11 @@ export default function Simulation() {
               <div className="text-xs text-slate-500 space-y-1 mb-3">
                 <div><b className="text-slate-600">Subject:</b> {campaign.email.subject}</div>
                 <div><b className="text-slate-600">From:</b> {campaign.email.sender_display} &lt;{campaign.email.sender_email}&gt;</div>
+                {campaign.email.link_text && (
+                  <div><b className="text-slate-600">Link button:</b> "{campaign.email.link_text}" (employees only see this label until they hover)</div>
+                )}
               </div>
-              <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans bg-slate-50 rounded-lg p-4 border border-slate-200">{campaign.email.body}</pre>
+              <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans bg-slate-50 rounded-lg p-4 border border-slate-200">{campaign.email.body.replaceAll('{name}', '[Employee name]')}</pre>
               <div className="mt-3 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
                   <FlagIcon size={12} /> Red flags (trainer view)

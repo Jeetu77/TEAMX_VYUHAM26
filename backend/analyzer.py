@@ -243,41 +243,128 @@ MESSAGE:<<<{text}>>>"""
     return result
 
 
+_TEMPLATES = [
+    {
+        "keys": ["kyc", "sbi", "bank"],
+        "sender": "State Bank of India", "link_text": "Update KYC Now",
+        "subject": {"easy": "URGENT: KYC update required - account will be BLOCKED in 24 hrs",
+                    "hard": "Action needed: periodic KYC re-verification for your account"},
+        "email": {"easy": "kyc-update@sbi-onlinesupport.co", "hard": "no-reply@sbi-kyc-alerts.in"},
+        "url": {"easy": "http://sbi-kyc-verify.online/update", "hard": "https://onlinesbi-kyc.co.in/verify"},
+        "body": ("Dear {name},\n\nAs per RBI guidelines, banks must periodically re-verify customer KYC details. "
+                 "Our records show your KYC is pending.{urgent}\n\nPlease complete verification here:\n\n"
+                 "{link}\n\nIf you have already updated your details, please ignore this message.\n\n"
+                 "Regards,\nCustomer Care, State Bank of India"),
+        "urgent": " Update within 24 hours to avoid restriction of net banking and UPI services.",
+        "flags": ["Sender domain is not the official onlinesbi.sbi", "Link text hides a non-SBI web address",
+                  "Pressure to act quickly or lose access", "Banks never ask you to verify KYC through email links"],
+    },
+    {
+        "keys": ["irctc", "ticket", "refund", "railway"],
+        "sender": "IRCTC Refunds", "link_text": "Claim Refund",
+        "subject": {"easy": "Your IRCTC refund Rs.1,840 is waiting - claim NOW",
+                    "hard": "IRCTC: refund initiated for cancelled ticket (PNR 4827391056)"},
+        "email": {"easy": "refund@irctc-refunds.in.net", "hard": "refunds@irctc-support.in"},
+        "url": {"easy": "http://irctc-refund-claim.xyz/pnr", "hard": "https://irctc-refunds.co.in/claim"},
+        "body": ("Dear {name},\n\nYour ticket cancellation has been processed and a refund of Rs. 1,840 is pending "
+                 "to your original payment method.{urgent}\n\nConfirm your bank details to receive the amount:\n\n"
+                 "{link}\n\nRegards,\nIRCTC Refund Cell"),
+        "urgent": " The refund will expire if not claimed today.",
+        "flags": ["IRCTC refunds go to the original payment source automatically", "Lookalike domain, not irctc.co.in",
+                  "Asks you to re-enter bank details", "Refund framed as expiring"],
+    },
+    {
+        "keys": ["upi", "cashback", "paytm", "phonepe", "gpay"],
+        "sender": "PhonePe Rewards", "link_text": "Collect Cashback",
+        "subject": {"easy": "You won Rs.5000 CASHBACK!! Collect before it expires",
+                    "hard": "Your PhonePe cashback of Rs. 250 is ready"},
+        "email": {"easy": "rewards@phonepe-cashback.top", "hard": "rewards@phonepe-offers.in"},
+        "url": {"easy": "http://phonepe-win-cashback.top/collect", "hard": "https://phonepe-offers.in/cashback"},
+        "body": ("Hi {name},\n\nCongratulations! You have been selected for a special UPI cashback reward.{urgent}\n\n"
+                 "Tap below and enter your UPI PIN to receive the money in your account:\n\n{link}\n\nTeam PhonePe"),
+        "urgent": " This offer ends in 2 hours.",
+        "flags": ["You never enter a UPI PIN to RECEIVE money", "Unsolicited prize or cashback",
+                  "Non-PhonePe domain", "Countdown pressure"],
+    },
+    {
+        "keys": ["hr", "payroll", "salary", "portal"],
+        "sender": "HR Payroll Team", "link_text": "Open Payroll Portal",
+        "subject": {"easy": "Payroll portal LOGIN REQUIRED - salary on hold",
+                    "hard": "Updated payroll details for this month - please review"},
+        "email": {"easy": "payroll@hr-portal-update.net", "hard": "hr-payroll@company-hrportal.com"},
+        "url": {"easy": "http://hr-payroll-login.net/signin", "hard": "https://company-hrportal.com/login"},
+        "body": ("Hello {name},\n\nWe are migrating to a new payroll system this month. To make sure your salary "
+                 "is credited on time, sign in with your company email and password.{urgent}\n\n{link}\n\n"
+                 "Thanks,\nHuman Resources"),
+        "urgent": " Accounts not verified by 5 PM today will have salary processing paused.",
+        "flags": ["Asks for your work password through a link", "Domain does not match your company's real HR system",
+                  "Threat to hold salary", "Generic sender, no named HR contact"],
+    },
+    {
+        "keys": ["courier", "delivery", "parcel", "package"],
+        "sender": "Delhivery Express", "link_text": "Reschedule Delivery",
+        "subject": {"easy": "Delivery FAILED - pay Rs.49 fee to avoid return",
+                    "hard": "We missed you: reschedule your parcel delivery"},
+        "email": {"easy": "support@delhivery-track.info", "hard": "alerts@delhivery-delivery.in"},
+        "url": {"easy": "http://delhivery-redelivery.info/pay", "hard": "https://delhivery-delivery.in/reschedule"},
+        "body": ("Dear {name},\n\nWe attempted to deliver your parcel (AWB 7740218832) but nobody was available. "
+                 "To reschedule, confirm your address and pay a small redelivery fee.{urgent}\n\n{link}\n\n"
+                 "Delhivery Customer Support"),
+        "urgent": " The parcel will be returned to the sender in 12 hours.",
+        "flags": ["Unexpected parcel with a fee to pay", "Not the official delhivery.com domain",
+                  "Asks for card details on an unknown page", "Return-to-sender deadline"],
+    },
+]
+
+
+def _mock_email(scenario: str, difficulty: str) -> dict:
+    s = scenario.lower()
+    t = next((x for x in _TEMPLATES if any(k in s for k in x["keys"])), _TEMPLATES[0])
+    # easy: crude everything; medium: believable domain but pushy wording; hard: subtle throughout
+    wording = "hard" if difficulty == "hard" else "easy"
+    domain = "easy" if difficulty == "easy" else "hard"
+    url = t["url"][domain]
+    body = t["body"].format(name="{name}", urgent="" if wording == "hard" else t["urgent"], link=url)
+    return {
+        "subject": t["subject"][wording],
+        "sender_display": t["sender"],
+        "sender_email": t["email"][domain],
+        "link_text": t["link_text"],
+        "body": body,
+        "red_flags": t["flags"],
+    }
+
+
 def generate_phishing_email(scenario: str, difficulty: str) -> dict:
     if MOCK or not _budget_ok():
-        return {
-            "subject": "Action Required: Complete your KYC update to avoid account restriction",
-            "sender_display": "SBI Customer Care",
-            "sender_email": "kyc-update@sbi-onlinesupport.co",
-            "body": ("Dear Valued Customer,\n\n"
-                     "As per RBI guidelines, your account KYC details are pending verification. "
-                     "Please update your details within 24 hours to avoid temporary restriction "
-                     "of net banking and UPI services.\n\n"
-                     "Update now: http://sbi-kyc-verify.online/update\n\n"
-                     "Regards,\nSBI Customer Care\n"
-                     f"[Training simulation — scenario: {scenario}, difficulty: {difficulty}]"),
-            "red_flags": [
-                "Sender domain is sbi-onlinesupport.co, not onlinesbi.sbi",
-                "24-hour deadline creates artificial urgency",
-                "Link points to a non-SBI domain",
-                "Generic greeting ('Dear Valued Customer')",
-            ],
-        }
+        return _mock_email(scenario, difficulty)
 
     prompt = f"""Generate a realistic phishing email for security awareness training.
 Scenario: {scenario}
 Difficulty: {difficulty} (easy=obvious red flags, hard=subtle)
 Indian context (UPI, Aadhaar, SBI, IRCTC etc.)
+Make it look like a real corporate email: professional tone, correct brand name, a plausible
+reference number, and a short sign-off. Greet with the literal placeholder {{name}} (it is replaced
+per employee). Put exactly one link in the body as a full http(s) URL on a lookalike domain,
+and give a short button label for it in link_text.
 
 Return ONLY valid JSON:
 {{
   "subject": "<email subject>",
   "sender_display": "<fake sender name>",
   "sender_email": "<fake email address>",
+  "link_text": "<button label, e.g. Verify Account>",
   "body": "<full email body>",
   "red_flags": ["<list of intentional red flags for trainer reference>"]
 }}"""
-    return _parse_json(_ask_claude(prompt))
+    try:
+        email = _parse_json(_ask_claude(prompt, max_tokens=3000))
+        if not all(email.get(k) for k in ("subject", "sender_display", "sender_email", "body")):
+            raise ValueError("incomplete email")
+        email.setdefault("red_flags", [])
+        return email
+    except Exception:
+        return _mock_email(scenario, difficulty)
 
 
 def generate_feedback(employee_name: str, action: str, email_subject: str) -> str:
