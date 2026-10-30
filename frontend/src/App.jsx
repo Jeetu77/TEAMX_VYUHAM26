@@ -38,7 +38,7 @@ export default function App() {
             <Shield size={18} className="text-blue-300" />
           </div>
           <div className="leading-tight">
-            <div className="font-semibold text-white tracking-tight">PhishGuard</div>
+            <div className="font-semibold text-white tracking-tight">CyberSafe</div>
             <div className="hidden md:block text-[10px] text-blue-200/60 tracking-wide uppercase">Phishing awareness</div>
           </div>
         </div>

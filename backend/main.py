@@ -9,7 +9,7 @@ from analyzer import analyze, generate_phishing_email, generate_feedback, MOCK, 
 from quiz import get_quiz
 import random
 
-app = FastAPI(title="PhishGuard API")
+app = FastAPI(title="CyberSafe API")
 
 app.add_middleware(CORSMiddleware,
     allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])

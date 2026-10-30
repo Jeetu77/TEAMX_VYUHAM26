@@ -1,4 +1,4 @@
-# 🛡️ PhishGuard
+# 🛡️ CyberSafe
 
 **AI-powered phishing detection and security awareness training.**  
 Spot scams before they land — and teach your team to do the same.
@@ -7,7 +7,7 @@ Spot scams before they land — and teach your team to do the same.
 
 ## What it does
 
-PhishGuard is a local security training tool with two core jobs:
+CyberSafe is a local security training tool with two core jobs:
 
 1. **Detect** — paste any suspicious email, SMS, or URL and get an instant verdict with the exact manipulation tactics explained.
 2. **Train** — run simulated phishing campaigns against your team, then quiz them on real-world scam patterns and award certificates to completers.

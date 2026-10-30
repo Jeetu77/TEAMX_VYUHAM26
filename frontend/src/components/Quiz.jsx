@@ -87,7 +87,7 @@ function makeCertificate(name, score, total) {
   ctx.font = '24px Georgia, serif'
   ctx.fillText(date, 370, 835)
   ctx.font = 'italic 30px Georgia, serif'
-  ctx.fillText('PhishGuard Trainer', W - 370, 833)
+  ctx.fillText('CyberSafe Trainer', W - 370, 833)
   ctx.fillStyle = '#64748b'
   ctx.font = '20px Georgia, serif'
   ctx.fillText('Date', 370, 885)
