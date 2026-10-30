@@ -70,7 +70,7 @@ Track awareness scores across all campaigns on a bar chart. Export any campaign 
 | Training quiz | 21-question bank of Indian scam patterns; random 6-question rounds |
 | Kerala scam library | Pick "Kerala local scams" in the quiz for KSEB bill threats, fake MVD e-challans, customs-parcel ("digital arrest") calls and loan-app harassment, with matching Simulation scenarios |
 | Certificate | Canvas-drawn PNG with the learner's name, score and date — no backend needed |
-| Dashboard | Bar chart of awareness scores per campaign; CSV export |
+| Dashboard | Bar chart of awareness scores per campaign; CSV export and a printable PDF report (stats, employee results, takeaways) |
 | History | Every analyzed message with verdict, confidence, impersonated brand and full tactics list |
 
 ---

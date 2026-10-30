@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { Download, Trash2 } from 'lucide-react'
+import { Download, Trash2, FileText, Loader2 } from 'lucide-react'
 import { getCampaigns, getCampaign, deleteCampaign } from '../api'
+import { exportCampaignPdf } from '../pdfReport'
 import { card, STATUS, StatCard, SectionTitle, ErrorNote, btnGhost } from '../ui'
 
 const scoreColor = (s) => s >= 70 ? 'text-emerald-600' : s >= 40 ? 'text-amber-600' : 'text-rose-600'
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const [campaigns, setCampaigns] = useState([])
   const [selected, setSelected] = useState(null)
   const [error, setError] = useState('')
+  const [pdfBusy, setPdfBusy] = useState(false)
 
   const refresh = useCallback(() => {
     getCampaigns()
@@ -56,9 +58,20 @@ export default function Dashboard() {
       rows.push([selected.campaign.name, t.employee_name, t.status, t.updated_at || '']))
     const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
-    const a = Object.assign(document.createElement('a'), { href: url, download: 'phishguard-campaign.csv' })
+    const a = Object.assign(document.createElement('a'), { href: url, download: 'cybersafe-campaign.csv' })
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const exportPdf = async () => {
+    if (!selected) return
+    setPdfBusy(true); setError('')
+    try {
+      await exportCampaignPdf(selected)
+    } catch {
+      setError('Could not create the PDF report.')
+    }
+    setPdfBusy(false)
   }
 
   const chartData = [...campaigns].reverse().map(c => ({
@@ -133,9 +146,15 @@ export default function Dashboard() {
         <div className={`${card} p-6 space-y-4`}>
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <h3 className="font-semibold text-lg text-slate-900">{selected.campaign.name}</h3>
-            <button onClick={exportCsv} className={btnGhost}>
-              <Download size={13} /> Export CSV
-            </button>
+            <div className="flex gap-2">
+              <button onClick={exportCsv} className={btnGhost}>
+                <Download size={13} /> Export CSV
+              </button>
+              <button onClick={exportPdf} disabled={pdfBusy} className={btnGhost}>
+                {pdfBusy ? <Loader2 size={13} className="animate-spin" /> : <FileText size={13} />}
+                Export PDF
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <StatCard label="Total sent" value={selected.stats.total} />
