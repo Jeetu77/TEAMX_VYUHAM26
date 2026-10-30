@@ -4,94 +4,152 @@ import { ShieldAlert, ShieldCheck, CheckCircle2, XCircle, RotateCcw,
 import { getQuiz } from '../api'
 import { card, SectionTitle, ErrorNote, btnPrimary, btnGhost, inputCls } from '../ui'
 
+const rankFor = (pct) => pct >= 90 ? 'Cyber Guardian' : pct >= 70 ? 'Scam Spotter' : 'Cyber Learner'
+
+function drawShield(ctx, cx, cy, s) {
+  const path = (k) => {
+    ctx.beginPath()
+    ctx.moveTo(cx, cy - 60 * k)
+    ctx.lineTo(cx + 50 * k, cy - 43 * k)
+    ctx.lineTo(cx + 50 * k, cy + 5 * k)
+    ctx.bezierCurveTo(cx + 50 * k, cy + 37 * k, cx + 26 * k, cy + 54 * k, cx, cy + 65 * k)
+    ctx.bezierCurveTo(cx - 26 * k, cy + 54 * k, cx - 50 * k, cy + 37 * k, cx - 50 * k, cy + 5 * k)
+    ctx.lineTo(cx - 50 * k, cy - 43 * k)
+    ctx.closePath()
+  }
+  path(s); ctx.fillStyle = '#dbeafe'; ctx.fill()
+  path(s * 0.84)
+  const g = ctx.createLinearGradient(0, cy - 50 * s, 0, cy + 55 * s)
+  g.addColorStop(0, '#3b82f6'); g.addColorStop(1, '#1e3a8a')
+  ctx.fillStyle = g; ctx.fill()
+  // Lock
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(cx - 16 * s, cy - 2 * s, 32 * s, 26 * s)
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 5 * s
+  ctx.beginPath(); ctx.arc(cx, cy - 2 * s, 10 * s, Math.PI, 0); ctx.stroke()
+  ctx.fillStyle = '#1e3a8a'
+  ctx.beginPath(); ctx.arc(cx, cy + 9 * s, 3.5 * s, 0, Math.PI * 2); ctx.fill()
+}
+
 /* Draw the completion certificate on a canvas and return it as a PNG data URL. */
-function makeCertificate(name, score, total) {
+function makeCertificate(name, score, total, topic) {
   const W = 1400, H = 990
   const c = document.createElement('canvas')
   c.width = W; c.height = H
   const ctx = c.getContext('2d')
+  const NAVY = '#1e3a8a', BLUE = '#2563eb', GREEN = '#16a34a', INK = '#0f172a', MUTED = '#475569'
 
-  // Background
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, W, H)
+  // Paper
+  const bg = ctx.createLinearGradient(0, 0, 0, H)
+  bg.addColorStop(0, '#f8fbff'); bg.addColorStop(1, '#ffffff')
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
 
-  // Soft corner decoration
-  const grad = ctx.createLinearGradient(0, 0, W, H)
-  grad.addColorStop(0, 'rgba(37,99,235,0.08)')
-  grad.addColorStop(0.5, 'rgba(37,99,235,0)')
-  grad.addColorStop(1, 'rgba(37,99,235,0.08)')
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, W, H)
+  // Faint network dots in the corners
+  ctx.fillStyle = 'rgba(37,99,235,0.10)'
+  for (let x = 70; x < W - 60; x += 28) for (let y = 70; y < H - 60; y += 28) {
+    const edge = Math.min(x, W - x, y, H - y)
+    if (edge < 140 && (x + y) % 3 === 0) { ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fill() }
+  }
 
-  // Borders
-  ctx.strokeStyle = '#2563eb'
-  ctx.lineWidth = 10
-  ctx.strokeRect(30, 30, W - 60, H - 60)
-  ctx.strokeStyle = '#93c5fd'
-  ctx.lineWidth = 2
-  ctx.strokeRect(50, 50, W - 100, H - 100)
+  // Top wave band
+  const top = ctx.createLinearGradient(0, 0, W, 0)
+  top.addColorStop(0, NAVY); top.addColorStop(1, BLUE)
+  ctx.fillStyle = top
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(W, 0); ctx.lineTo(W, 70)
+  ctx.bezierCurveTo(W * 0.7, 130, W * 0.35, 30, 0, 95); ctx.closePath(); ctx.fill()
+
+  // Bottom Kerala swoosh (green + blue)
+  const swoosh = (y0, color, h) => {
+    ctx.fillStyle = color
+    ctx.beginPath(); ctx.moveTo(0, y0)
+    ctx.bezierCurveTo(W * 0.3, y0 - 60, W * 0.6, y0 + 40, W, y0 - 50)
+    ctx.lineTo(W, y0 - 50 + h); ctx.bezierCurveTo(W * 0.6, y0 + 40 + h, W * 0.3, y0 - 60 + h, 0, y0 + h)
+    ctx.closePath(); ctx.fill()
+  }
+  swoosh(H - 70, GREEN, 14)
+  swoosh(H - 56, BLUE, 14)
+  ctx.fillStyle = NAVY
+  ctx.beginPath(); ctx.moveTo(0, H - 42)
+  ctx.bezierCurveTo(W * 0.3, H - 102, W * 0.6, H - 2, W, H - 92)
+  ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill()
+
+  // Inner frame
+  ctx.strokeStyle = 'rgba(37,99,235,0.35)'; ctx.lineWidth = 2
+  ctx.strokeRect(46, 46, W - 92, H - 92)
 
   ctx.textAlign = 'center'
 
-  // Shield mark
-  ctx.font = '64px serif'
-  ctx.fillStyle = '#2563eb'
-  ctx.fillText('\u{1F6E1}️', W / 2, 108)
+  // Brand
+  drawShield(ctx, W / 2, 190, 0.95)
+  ctx.fillStyle = NAVY; ctx.font = 'bold 30px Georgia, serif'
+  ctx.fillText('C Y B E R S A F E', W / 2, 296)
+  ctx.fillStyle = GREEN; ctx.font = 'bold 18px Arial, sans-serif'
+  ctx.fillText('C Y B E R   S A F E   K E R A L A M', W / 2, 326)
 
-  // Header
-  ctx.fillStyle = '#2563eb'
-  ctx.font = 'bold 30px Georgia, serif'
-  ctx.fillText('P H I S H G U A R D', W / 2, 190)
+  // Title
+  ctx.fillStyle = INK; ctx.font = 'bold 58px Georgia, serif'
+  ctx.fillText('Certificate of Cyber Awareness', W / 2, 405)
+  const lg = ctx.createLinearGradient(W / 2 - 200, 0, W / 2 + 200, 0)
+  lg.addColorStop(0, GREEN); lg.addColorStop(1, BLUE)
+  ctx.strokeStyle = lg; ctx.lineWidth = 4
+  ctx.beginPath(); ctx.moveTo(W / 2 - 200, 430); ctx.lineTo(W / 2 + 200, 430); ctx.stroke()
 
-  ctx.fillStyle = '#0f172a'
-  ctx.font = 'bold 64px Georgia, serif'
-  ctx.fillText('Certificate of Completion', W / 2, 280)
+  ctx.fillStyle = MUTED; ctx.font = '26px Georgia, serif'
+  ctx.fillText('This is proudly presented to', W / 2, 488)
 
-  ctx.strokeStyle = '#2563eb'
-  ctx.lineWidth = 3
-  ctx.beginPath(); ctx.moveTo(W / 2 - 180, 310); ctx.lineTo(W / 2 + 180, 310); ctx.stroke()
+  // Name (shrink to fit long names)
+  let size = 68
+  ctx.font = `italic bold ${size}px Georgia, serif`
+  while (ctx.measureText(name).width > W - 360 && size > 36) { size -= 4; ctx.font = `italic bold ${size}px Georgia, serif` }
+  ctx.fillStyle = BLUE; ctx.fillText(name, W / 2, 568)
+  const nameWidth = Math.min(ctx.measureText(name).width + 80, W - 300)
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(W / 2 - nameWidth / 2, 592); ctx.lineTo(W / 2 + nameWidth / 2, 592); ctx.stroke()
 
-  ctx.fillStyle = '#475569'
-  ctx.font = '28px Georgia, serif'
-  ctx.fillText('This certifies that', W / 2, 390)
+  const edition = topic === 'kerala' ? 'Kerala Local Scams edition' : 'Mixed Scams edition'
+  ctx.fillStyle = MUTED; ctx.font = '25px Georgia, serif'
+  ctx.fillText('for successfully completing the Cyber Safe Keralam', W / 2, 642)
+  ctx.fillText(`Phishing & Scam Awareness Quiz (${edition})`, W / 2, 678)
 
-  // Name
-  ctx.fillStyle = '#1d4ed8'
-  ctx.font = 'italic bold 72px Georgia, serif'
-  ctx.fillText(name, W / 2, 490)
-  const nameWidth = Math.min(ctx.measureText(name).width + 60, W - 300)
-  ctx.strokeStyle = '#cbd5e1'
-  ctx.lineWidth = 2
-  ctx.beginPath(); ctx.moveTo(W / 2 - nameWidth / 2, 515); ctx.lineTo(W / 2 + nameWidth / 2, 515); ctx.stroke()
-
-  ctx.fillStyle = '#475569'
-  ctx.font = '28px Georgia, serif'
-  ctx.fillText('has successfully completed the', W / 2, 585)
-  ctx.fillStyle = '#0f172a'
-  ctx.font = 'bold 34px Georgia, serif'
-  ctx.fillText('Security Awareness Training Quiz', W / 2, 635)
-
-  // Score
+  // Score seal
   const pct = Math.round((score / total) * 100)
-  ctx.fillStyle = '#2563eb'
-  ctx.font = 'bold 30px Georgia, serif'
-  ctx.fillText(`Score: ${score} / ${total}  (${pct}%)`, W / 2, 710)
+  const sx = W / 2, sy = 790
+  ctx.fillStyle = '#f59e0b'
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2
+    ctx.beginPath(); ctx.arc(sx + Math.cos(a) * 64, sy + Math.sin(a) * 64, 10, 0, Math.PI * 2); ctx.fill()
+  }
+  const sg = ctx.createRadialGradient(sx - 15, sy - 15, 5, sx, sy, 66)
+  sg.addColorStop(0, '#fde68a'); sg.addColorStop(1, '#d97706')
+  ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(sx, sy, 64, 0, Math.PI * 2); ctx.fill()
+  ctx.strokeStyle = '#fff7ed'; ctx.lineWidth = 3
+  ctx.beginPath(); ctx.arc(sx, sy, 52, 0, Math.PI * 2); ctx.stroke()
+  ctx.fillStyle = '#7c2d12'; ctx.font = 'bold 34px Georgia, serif'
+  ctx.fillText(`${pct}%`, sx, sy + 4)
+  ctx.font = 'bold 14px Arial, sans-serif'
+  ctx.fillText(`${score} / ${total}`, sx, sy + 26)
+  ctx.fillStyle = NAVY; ctx.font = 'bold 22px Arial, sans-serif'
+  ctx.fillText(rankFor(pct).toUpperCase(), sx, sy + 98)
 
-  // Footer: date + signature
-  const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
-  ctx.strokeStyle = '#94a3b8'
-  ctx.lineWidth = 2
-  ctx.beginPath(); ctx.moveTo(220, 850); ctx.lineTo(520, 850); ctx.stroke()
-  ctx.beginPath(); ctx.moveTo(W - 520, 850); ctx.lineTo(W - 220, 850); ctx.stroke()
-  ctx.fillStyle = '#334155'
-  ctx.font = '24px Georgia, serif'
-  ctx.fillText(date, 370, 835)
-  ctx.font = 'italic 30px Georgia, serif'
-  ctx.fillText('CyberSafe Trainer', W - 370, 833)
-  ctx.fillStyle = '#64748b'
-  ctx.font = '20px Georgia, serif'
-  ctx.fillText('Date', 370, 885)
-  ctx.fillText('Authorized by', W - 370, 885)
+  // Footer: date + issuer
+  const now = new Date()
+  const date = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+  const ymd = now.toISOString().slice(0, 10).replace(/-/g, '')
+  // Deterministic so re-renders show the same ID that gets downloaded
+  const seed = [...`${name}|${score}|${total}|${topic}|${ymd}`].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7)
+  const certId = `CSK-${ymd}-${seed.toString(36).toUpperCase().padStart(6, '0').slice(-6)}`
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2
+  ctx.beginPath(); ctx.moveTo(190, 805); ctx.lineTo(490, 805); ctx.stroke()
+  ctx.beginPath(); ctx.moveTo(W - 490, 805); ctx.lineTo(W - 190, 805); ctx.stroke()
+  ctx.fillStyle = '#334155'; ctx.font = '24px Georgia, serif'
+  ctx.fillText(date, 340, 790)
+  ctx.font = 'italic 28px Georgia, serif'
+  ctx.fillText('CyberSafe Programme', W - 340, 790)
+  ctx.fillStyle = '#64748b'; ctx.font = '19px Georgia, serif'
+  ctx.fillText('Date of issue', 340, 835)
+  ctx.fillText('Issued by', W - 340, 835)
+  ctx.font = '15px Arial, sans-serif'; ctx.fillStyle = '#94a3b8'
+  ctx.fillText(`Certificate ID: ${certId}`, 340, 862)
 
   return c.toDataURL('image/png')
 }
@@ -189,11 +247,11 @@ export default function Quiz() {
       : pct >= 70 ? 'Strong result. Review the ones you missed and you\'re there.'
       : pct >= 40 ? 'A good start — the red flags get easier to spot with practice.'
       : 'Phishing fooled you this time. Retake the quiz and watch the sender domains.'
-    const certUrl = makeCertificate(name.trim(), score, questions.length)
+    const certUrl = makeCertificate(name.trim(), score, questions.length, topic)
     const download = () => {
       const a = Object.assign(document.createElement('a'), {
         href: certUrl,
-        download: `phishguard-certificate-${name.trim().toLowerCase().replace(/\s+/g, '-')}.png`,
+        download: `cybersafe-keralam-certificate-${name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`,
       })
       a.click()
     }
@@ -211,7 +269,7 @@ export default function Quiz() {
 
         {/* Certificate */}
         <div className="max-w-2xl mx-auto space-y-3">
-          <img src={certUrl} alt={`Certificate of completion for ${name}`}
+          <img src={certUrl} alt={`Certificate of Cyber Awareness for ${name}`}
             className="w-full rounded-xl border border-slate-200 shadow-md" />
           <div className="flex gap-3 justify-center">
             <button onClick={download} className={btnPrimary}>
