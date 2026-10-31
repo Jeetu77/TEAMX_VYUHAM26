@@ -14,4 +14,5 @@ export const getFeedback = (campaign_id, target_id) =>
   axios.post(`${BASE}/campaigns/${campaign_id}/feedback/${target_id}`)
 export const autoSimulate = (campaign_id, difficulty) =>
   axios.post(`${BASE}/campaigns/${campaign_id}/auto_simulate`, { difficulty })
+export const getHealth = () => axios.get(`${BASE}/health`, { timeout: 4000 })
 export const getQuiz = (n = 6, topic = 'all') => axios.get(`${BASE}/quiz?n=${n}&topic=${topic}`)
