@@ -20,39 +20,47 @@ No real emails leave the app. Everything runs on your own machine.
 
 ### Home
 
-![Home screen](docs/home.jpg)
+![Home screen](docs/home.png)
 
 ---
 
 ### Phishing Detection
 
-Paste a message and click **Analyze**. The rule engine and AI flag urgency language, lookalike domains, IP-based links and credential requests in seconds.
+Paste a message (or upload a WhatsApp/SMS screenshot) and click **Analyze**. The rule engine, URL reputation check and AI flag urgency language, lookalike domains, known phishing links and credential requests in seconds.
 
-![Detection result](docs/detection.jpg)
+![Detection result](docs/detection.png)
 
 ---
 
 ### Simulation
 
-Create a campaign, pick a phishing scenario and difficulty, add employee names, and launch. Each employee gets a simulated inbox — you can watch who clicks, who reports, and who ignores.
+Create a campaign, pick a phishing scenario and difficulty, add employee names, and launch. Each employee gets a realistic simulated inbox: the email greets them by name and the link's real address only shows on hover. You can see who opens, clicks, reports or ignores it.
 
-![Simulation screen](docs/simulation.jpg)
+![Simulated inbox](docs/simulation.png)
 
 ---
 
 ### Training Quiz
 
-Six real-world messages sampled from an Indian scam bank (KYC, UPI, IRCTC, bank alerts, lottery, courier). Call each one phishing or legit, see the red flags explained, and earn a certificate.
+Six real-world messages per round, from mixed Indian scams or the Kerala local scam library (KSEB bills, fake e-challans, customs "digital arrest" calls, loan apps). Call each one phishing or legit and see the red flags explained.
 
-![Quiz screen](docs/quiz.jpg)
+![Quiz screen](docs/quiz.png)
+
+---
+
+### Certificate
+
+Finish the quiz to earn a "Certificate of Cyber Awareness" with your name, score, rank and a certificate ID.
+
+![Certificate](docs/certificate.png)
 
 ---
 
 ### Awareness Dashboard
 
-Track awareness scores across all campaigns on a bar chart. Export any campaign to CSV, or drill into individual employee results.
+Track awareness scores across all campaigns on a bar chart. Drill into individual employee results and export any campaign to CSV or a PDF report.
 
-![Dashboard](docs/dashboard.jpg)
+![Dashboard](docs/dashboard.png)
 
 ---
 
