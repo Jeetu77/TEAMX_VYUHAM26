@@ -177,7 +177,7 @@ def _mock_analysis(rule_findings: list) -> dict:
 
     tactics = [{"tactic": f["rule"].replace("_", " ").title(),
                 "evidence": f["detail"],
-                "explanation": "Flagged by the rule engine (mock mode - no AI call made)."}
+                "explanation": "Flagged by the rule engine."}
                for f in rule_findings]
     brand = next((b.upper() for f in rule_findings if f["rule"] == "lookalike_domain"
                   for b in INDIAN_BRANDS if f"'{b}'" in f["detail"]), None)
