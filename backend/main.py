@@ -13,7 +13,8 @@ import os, random, base64, binascii
 app = FastAPI(title="CyberSafe API")
 
 # Comma-separated list, e.g. "https://cybersafe.netlify.app". Unset = allow any (local dev).
-ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
+# Browsers send the origin without a trailing slash, so strip any that were pasted in.
+ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in (os.getenv("ALLOWED_ORIGINS") or "*").split(",") if o.strip()]
 
 app.add_middleware(CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS, allow_methods=["*"], allow_headers=["*"])
