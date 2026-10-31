@@ -8,12 +8,15 @@ from database import init_db, save_analysis, create_campaign, \
 from analyzer import (analyze, analyze_image, generate_phishing_email, generate_feedback,
                       MOCK, get_usage, AIUnavailable, NoMessageFound)
 from quiz import get_quiz
-import random, base64, binascii
+import os, random, base64, binascii
 
 app = FastAPI(title="CyberSafe API")
 
+# Comma-separated list, e.g. "https://cybersafe.netlify.app". Unset = allow any (local dev).
+ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
+
 app.add_middleware(CORSMiddleware,
-    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+    allow_origins=ALLOWED_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 init_db()
 

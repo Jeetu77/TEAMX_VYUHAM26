@@ -1,0 +1,27 @@
+# Render Blueprint for the CyberSafe FastAPI backend.
+# In Render: New > Blueprint > pick this repo. You'll be asked for the values marked sync: false.
+services:
+  - type: web
+    name: cybersafe-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: MOCK_AI
+        value: "false"
+      # A public server can be used by anyone who finds it: keep a daily cap on AI calls.
+      - key: DAILY_API_LIMIT
+        value: "50"
+      - key: RULE_CONFIDENCE_THRESHOLD
+        value: "70"
+      - key: URL_REPUTATION
+        value: "true"

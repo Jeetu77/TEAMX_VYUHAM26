@@ -1,0 +1,22 @@
+# Netlify builds and hosts the React frontend only.
+# The FastAPI backend runs separately (see render.yaml); point the frontend at it
+# with the VITE_API_URL environment variable in Netlify's site settings.
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

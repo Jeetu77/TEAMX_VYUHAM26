@@ -128,6 +128,32 @@ Open **http://localhost:5173** in your browser.
 
 ---
 
+## Deploy online (Netlify + Render)
+
+Netlify hosts the React frontend; the Python backend runs on Render (free tier). Both deploy straight from this GitHub repo, and the config files are already included (`netlify.toml`, `render.yaml`).
+
+### 1. Backend on Render
+
+1. Sign in at [render.com](https://render.com) with GitHub, then **New → Blueprint** and pick this repository.
+2. When asked, fill in:
+   - `ANTHROPIC_API_KEY`: your Claude API key (entered only in Render, never committed)
+   - `ALLOWED_ORIGINS`: leave blank for now; you'll set it in step 3
+3. Deploy. Copy the service URL, e.g. `https://cybersafe-api.onrender.com`, and check `<url>/health` returns `"status":"ok"`.
+
+### 2. Frontend on Netlify
+
+1. Sign in at [netlify.com](https://netlify.com) with GitHub, then **Add new site → Import an existing project** and pick this repository. Build settings are read from `netlify.toml`.
+2. Under **Site configuration → Environment variables**, add `VITE_API_URL` = your Render URL (no trailing slash).
+3. Deploy, then copy your site URL, e.g. `https://cybersafe-keralam.netlify.app`.
+
+### 3. Connect the two
+
+In Render, set `ALLOWED_ORIGINS` to your Netlify site URL and redeploy. The backend will then only accept requests from your site.
+
+> **Notes:** Render's free tier sleeps after ~15 minutes idle, so the first request can take up to a minute (the sidebar shows "Backend offline" until it wakes). Its disk is temporary, so campaigns and history reset when the service restarts. The deployed backend keeps a daily AI-call cap (`DAILY_API_LIMIT`, 50 by default) because anyone with the link can use it; also set a monthly spend limit in the Anthropic Console.
+
+---
+
 ## Project structure
 
 ```
